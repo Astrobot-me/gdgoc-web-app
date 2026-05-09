@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -12,28 +12,55 @@ datasource db {
   provider = "postgresql"
 }
 
-
-model Events { 
-  id String @id @default(uuid()) 
-  name String 
-  descirption String
-  eventDate DateTime
-  venue String?
-  createdAt  DateTime @default(now())
-  updatedAt DateTime
-  certificates Certifate[]
-
-
+model Event {
+  id            String           @id @default(uuid())
+  name          String
+  description   String?
+  eventDate     DateTime
+  venue         String?
+  bannerUrl     String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  certificates  Certificate[]
+  verifyLogs    VerificationLog[]
 }
 
-model Certifate { 
-  certId String @id @default(uuid()) 
-  eventId String 
-  holderName String
-  rollNumber BigInt
-  branch String
-  issuedAt DateTime 
-  createdAt DateTime @default(now())
+model Certificate {
+  id          String            @id @default(uuid())
+  credentialId String?          @unique
+  eventId     String
+  holderName  String
+  rollNumber  String
+  branch      String
+  issuedAt    DateTime          @default(now())
+  revokedAt   DateTime?
+  createdAt   DateTime          @default(now())
+  event       Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  verifyLogs  VerificationLog[]
 
-  event Events @relation(fields: [certId], references: [id])
+  @@index([eventId])
+  @@index([credentialId])
+  @@index([rollNumber])
+}
+
+model VerificationLog {
+  id         String              @id @default(uuid())
+  certId     String?
+  eventId    String?
+  status     VerificationStatus
+  userAgent  String?
+  referer    String?
+  createdAt  DateTime            @default(now())
+  certificate Certificate?       @relation(fields: [certId], references: [id])
+  event      Event?              @relation(fields: [eventId], references: [id])
+
+  @@index([certId])
+  @@index([eventId])
+  @@index([createdAt])
+}
+
+enum VerificationStatus {
+  VALID
+  REVOKED
+  NOT_FOUND
 }
