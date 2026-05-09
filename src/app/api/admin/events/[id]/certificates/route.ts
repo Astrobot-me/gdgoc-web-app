@@ -29,6 +29,8 @@ export async function POST(
         holderName: parsed.data.holderName,
         rollNumber: parsed.data.rollNumber,
         branch: parsed.data.branch,
+        certificateType: parsed.data.certificateType,
+        distinction: parsed.data.distinction,
         issuedAt: parsed.data.issuedAt,
       },
     });

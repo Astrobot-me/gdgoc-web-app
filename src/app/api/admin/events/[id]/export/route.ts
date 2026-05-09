@@ -33,6 +33,8 @@ export async function GET(request: NextRequest, { params }: ExportRouteParams) {
       holderName: cert.holderName,
       rollNumber: cert.rollNumber,
       branch: cert.branch,
+      certificateType: cert.certificateType,
+      distinction: cert.distinction,
       issuedAt: cert.issuedAt,
       revokedAt: cert.revokedAt,
       createdAt: cert.createdAt,
@@ -47,6 +49,8 @@ export async function GET(request: NextRequest, { params }: ExportRouteParams) {
       "Holder Name",
       "Roll Number",
       "Branch",
+      "Certificate Type",
+      "Distinction",
       "Issued At",
       "Revoked At",
     ];
@@ -56,6 +60,8 @@ export async function GET(request: NextRequest, { params }: ExportRouteParams) {
         cert.holderName,
         cert.rollNumber,
         cert.branch,
+        cert.certificateType,
+        cert.distinction ?? "",
         cert.issuedAt?.toISOString?.() ?? String(cert.issuedAt),
         cert.revokedAt?.toISOString?.() ?? "",
       ]

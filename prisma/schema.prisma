@@ -26,19 +26,22 @@ model Event {
 }
 
 model Certificate {
-  id          String            @id @default(uuid())
-  credentialId String?          @unique
-  eventId     String
-  holderName  String
-  rollNumber  String
-  branch      String
-  issuedAt    DateTime          @default(now())
-  revokedAt   DateTime?
-  createdAt   DateTime          @default(now())
-  event       Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  verifyLogs  VerificationLog[]
+  id              String            @id @default(uuid())
+  credentialId    String?           @unique
+  eventId         String
+  holderName      String
+  rollNumber      String
+  branch          String
+  certificateType CertificateType   @default(PARTICIPATION)
+  distinction     String?
+  issuedAt        DateTime          @default(now())
+  revokedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  event           Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  verifyLogs      VerificationLog[]
 
   @@index([eventId])
+  @@index([certificateType])
   @@index([credentialId])
   @@index([rollNumber])
 }
@@ -63,4 +66,9 @@ enum VerificationStatus {
   VALID
   REVOKED
   NOT_FOUND
+}
+
+enum CertificateType {
+  PARTICIPATION
+  WINNER
 }

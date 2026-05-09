@@ -71,6 +71,18 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
   const nameIndex = getHeaderIndex(headers, ["name", "holder name"]);
   const branchIndex = getHeaderIndex(headers, ["branch"]);
   const rollIndex = getHeaderIndex(headers, ["roll number", "roll_number"]);
+  const typeIndex = getHeaderIndex(headers, [
+    "certificate type",
+    "certificate_type",
+    "type",
+  ]);
+  const distinctionIndex = getHeaderIndex(headers, [
+    "distinction",
+    "achievement",
+    "award",
+    "position",
+    "result",
+  ]);
 
   if ([credentialIndex, nameIndex, branchIndex, rollIndex].some((idx) => idx < 0)) {
     return NextResponse.json(
@@ -86,8 +98,20 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
       const holderName = String(row[nameIndex] ?? "").trim();
       const branch = String(row[branchIndex] ?? "").trim();
       const rollNumber = String(row[rollIndex] ?? "").trim();
+      const certificateType = row[typeIndex] ?? undefined;
+      const distinction =
+        distinctionIndex >= 0
+          ? String(row[distinctionIndex] ?? "").trim() || undefined
+          : undefined;
 
-      if (!credentialId && !holderName && !branch && !rollNumber) {
+      if (
+        !credentialId &&
+        !holderName &&
+        !branch &&
+        !rollNumber &&
+        !certificateType &&
+        !distinction
+      ) {
         return null;
       }
 
@@ -96,6 +120,8 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
         holderName,
         branch,
         rollNumber,
+        certificateType,
+        distinction,
       });
 
       if (!parsed.success) {
@@ -157,6 +183,8 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
           holderName: row.holderName,
           rollNumber: row.rollNumber,
           branch: row.branch,
+          certificateType: row.certificateType,
+          distinction: row.distinction,
         },
       });
       updated += 1;
@@ -170,6 +198,8 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
         holderName: row.holderName,
         rollNumber: row.rollNumber,
         branch: row.branch,
+        certificateType: row.certificateType,
+        distinction: row.distinction,
       },
     });
     inserted += 1;

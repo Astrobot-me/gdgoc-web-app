@@ -2,7 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { UploadCloud } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type UploadResult = {
   inserted: number;
@@ -50,57 +54,56 @@ export function UploadPanel({ eventId }: UploadPanelProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm"
-    >
-      <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Bulk upload
-        </p>
-        <h3 className="mt-2 font-heading text-xl text-foreground">
-          Import participants
-        </h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Upload .xlsx, .xls, or .csv with Credential ID, Name, Branch, and Roll
-          Number columns.
-        </p>
-      </div>
-      <div className="mt-4 flex flex-col gap-3">
-        <input
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          className="text-sm"
-        />
-        <Button type="submit" size="lg" disabled={isPending} className="gap-2">
-          Upload file
-          <UploadCloud className="size-4" />
-        </Button>
-      </div>
-      {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
-      {result ? (
-        <div className="mt-4 rounded-2xl border border-muted/50 bg-muted/20 p-4 text-sm">
-          <p>
-            Inserted: <strong>{result.inserted}</strong>
-          </p>
-          <p>
-            Updated: <strong>{result.updated}</strong>
-          </p>
-          {result.errors.length ? (
-            <div className="mt-3 space-y-1 text-destructive">
-              {result.errors.slice(0, 5).map((item, index) => (
-                <p key={`${item.message}-${index}`}>
-                  Row {item.row}: {item.message}
+    <form onSubmit={handleSubmit}>
+      <AdminSectionCard
+        eyebrow="Bulk upload"
+        title="Import participants"
+        description="Upload .xlsx, .xls, or .csv with Credential ID, Name, Branch, and Roll Number columns."
+      >
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="upload-file">Spreadsheet file</Label>
+            <Input
+              id="upload-file"
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            />
+          </div>
+          <Button type="submit" size="lg" disabled={isPending} className="gap-2">
+            Upload file
+            <UploadCloud className="size-4" />
+          </Button>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          {result ? (
+            <Alert>
+              <AlertTitle>Upload summary</AlertTitle>
+              <AlertDescription>
+                <p>
+                  Inserted: <strong>{result.inserted}</strong>
                 </p>
-              ))}
-              {result.errors.length > 5 ? (
-                <p>More errors hidden...</p>
-              ) : null}
-            </div>
+                <p>
+                  Updated: <strong>{result.updated}</strong>
+                </p>
+                {result.errors.length ? (
+                  <div className="mt-3 space-y-1 text-destructive">
+                    {result.errors.slice(0, 5).map((item, index) => (
+                      <p key={`${item.message}-${index}`}>
+                        Row {item.row}: {item.message}
+                      </p>
+                    ))}
+                    {result.errors.length > 5 ? <p>More errors hidden...</p> : null}
+                  </div>
+                ) : null}
+              </AlertDescription>
+            </Alert>
           ) : null}
         </div>
-      ) : null}
+      </AdminSectionCard>
     </form>
   );
 }

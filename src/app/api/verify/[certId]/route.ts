@@ -61,6 +61,8 @@ export async function GET(request: NextRequest, { params }: VerifyRouteParams) {
             holderName: certificate.holderName,
             rollNumber: certificate.rollNumber,
             branch: certificate.branch,
+            certificateType: certificate.certificateType,
+            distinction: certificate.distinction,
             issuedAt: certificate.issuedAt,
             revokedAt: certificate.revokedAt,
         },

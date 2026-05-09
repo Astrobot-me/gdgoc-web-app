@@ -6,7 +6,6 @@ import { AlertTriangle, BadgeCheck, ArrowUpRight } from "lucide-react";
 import { ShareButton } from "@/components/share-button";
 import { Button } from "@/components/ui/button";
 
-export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 type VerifyPageProps = {

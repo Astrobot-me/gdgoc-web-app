@@ -3,7 +3,19 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { RevokeButton } from "@/components/admin/revoke-button";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export type CertificateRow = {
   id: string;
@@ -45,86 +57,78 @@ export function CertificateTable({ eventId, rows }: CertificateTableProps) {
   };
 
   return (
-    <div className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Certificates
-          </p>
-          <h3 className="mt-2 font-heading text-xl text-foreground">
-            Participant records
-          </h3>
-        </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-muted/50 bg-white px-3 py-2 text-sm">
-          <Search className="size-4 text-muted-foreground" />
-          <input
+    <AdminSectionCard
+      eyebrow="Certificates"
+      title="Participant records"
+      actions={
+        <div className="relative w-full sm:w-64">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search by name, roll, branch"
-            className="w-48 bg-transparent text-sm outline-none"
+            className="pl-9"
           />
         </div>
-      </div>
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[720px] border-collapse text-sm">
-          <thead>
-            <tr className="text-left text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              <th className="py-2">Holder</th>
-              <th>Roll</th>
-              <th>Branch</th>
-              <th>Issued</th>
-              <th>Status</th>
-              <th className="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-muted/40">
+      }
+    >
+      <div className="space-y-4">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Holder</TableHead>
+              <TableHead>Roll</TableHead>
+              <TableHead>Branch</TableHead>
+              <TableHead>Issued</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filtered.map((row) => (
-              <tr key={row.id} className="text-foreground">
-                <td className="py-3">
+              <TableRow key={row.id}>
+                <TableCell>
                   <div className="font-semibold">{row.holderName}</div>
                   <div className="text-xs text-muted-foreground">
                     {row.credentialId ?? row.id}
                   </div>
-                </td>
-                <td>{row.rollNumber}</td>
-                <td>{row.branch}</td>
-                <td>{row.issuedAt}</td>
-                <td>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      row.revokedAt
-                        ? "bg-(--gdg-red)/15 text-(--gdg-red)"
-                        : "bg-(--gdg-green)/15 text-(--gdg-green)"
-                    }`}
-                  >
+                </TableCell>
+                <TableCell>{row.rollNumber}</TableCell>
+                <TableCell>{row.branch}</TableCell>
+                <TableCell>{row.issuedAt}</TableCell>
+                <TableCell>
+                  <StatusBadge tone={row.revokedAt ? "revoked" : "active"}>
                     {row.revokedAt ? "Revoked" : "Active"}
-                  </span>
-                </td>
-                <td className="flex justify-end gap-2 py-3">
-                  <Link
-                    href={`/admin/events/${eventId}/certificates/${
-                      row.credentialId ?? row.id
-                    }`}
-                    className="rounded-full border border-muted/50 px-3 py-1 text-xs font-semibold"
-                  >
-                    View
-                  </Link>
-                  <RevokeButton
-                    certId={row.credentialId ?? row.id}
-                    revokedAt={row.revokedAt}
-                    onChange={(value) => updateRow(row.id, value)}
-                  />
-                </td>
-              </tr>
+                  </StatusBadge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button asChild size="sm" variant="outline">
+                      <Link
+                        href={`/admin/events/${eventId}/certificates/${
+                          row.credentialId ?? row.id
+                        }`}
+                      >
+                        View
+                      </Link>
+                    </Button>
+                    <RevokeButton
+                      certId={row.credentialId ?? row.id}
+                      revokedAt={row.revokedAt}
+                      onChange={(value) => updateRow(row.id, value)}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         {!filtered.length ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">
+          <p className="py-2 text-center text-sm text-muted-foreground">
             No certificates match the search.
           </p>
         ) : null}
       </div>
-    </div>
+    </AdminSectionCard>
   );
 }

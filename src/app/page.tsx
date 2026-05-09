@@ -4,8 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { VerifyLookupForm } from "@/components/verify-lookup-form";
 
-export const revalidate = 60 * 60 * 24;
-
 const communityUrl =
   process.env.GDG_COMMUNITY_URL ??
   "https://gdg.community.dev/gdg-on-campus-roorkee-institute-of-technology-roorkee-india";

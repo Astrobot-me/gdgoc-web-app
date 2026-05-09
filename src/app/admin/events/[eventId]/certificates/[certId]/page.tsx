@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { prisma } from "@/lib/prisma";
 import { ShareButton } from "@/components/share-button";
 import { RevokeButton } from "@/components/admin/revoke-button";
-
-export const dynamic = "force-dynamic";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { Button } from "@/components/ui/button";
 
 type CertificateDetailProps = {
   params: Promise<{ eventId: string; certId: string }>;
@@ -44,35 +45,24 @@ export default async function CertificateDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Certificate detail
-            </p>
-            <h1 className="mt-2 font-heading text-2xl text-foreground">
-              {certificate.holderName}
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {certificate.event.name} • {formatDate(certificate.event.eventDate)}
-            </p>
-          </div>
-          <Link
-            href={`/admin/events/${eventId}`}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-(--gdg-blue)"
-          >
-            Back to event
-            <ArrowUpRight className="size-4" />
-          </Link>
-        </div>
-      </section>
+      <AdminSectionCard
+        eyebrow="Certificate detail"
+        title={certificate.holderName}
+        titleClassName="text-2xl"
+        description={`${certificate.event.name} • ${formatDate(certificate.event.eventDate)}`}
+        actions={
+          <Button asChild variant="link" className="h-auto px-0 text-(--gdg-blue)">
+            <Link href={`/admin/events/${eventId}/certificates`}>
+              Back to records
+              <ArrowUpRight className="size-4" />
+            </Link>
+          </Button>
+        }
+      />
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-          <h2 className="font-heading text-xl text-foreground">
-            Certificate preview
-          </h2>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-muted/40 bg-white">
+        <AdminSectionCard title="Certificate preview">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-border/60 bg-background/70">
             <Image
               src={`${baseUrl}/api/certificate/${verifyId}/image`}
               alt="Certificate preview"
@@ -83,25 +73,20 @@ export default async function CertificateDetailPage({
             />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <a
-              href={`${baseUrl}/api/certificate/${verifyId}/image`}
-              className="inline-flex items-center gap-2 rounded-full border border-muted/50 px-3 py-1 text-xs font-semibold"
-              download
-            >
-              Download image
-              <ArrowUpRight className="size-4" />
-            </a>
+            <Button asChild size="sm" variant="outline">
+              <a href={`${baseUrl}/api/certificate/${verifyId}/image`} download>
+                Download image
+                <ArrowUpRight className="size-4" />
+              </a>
+            </Button>
             <ShareButton value={verifyUrl} />
           </div>
-        </div>
+        </AdminSectionCard>
 
-        <div className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="font-heading text-xl text-foreground">
-              Certificate status
-            </h2>
-            <BadgeCheck className="size-5 text-(--gdg-green)" />
-          </div>
+        <AdminSectionCard
+          title="Certificate status"
+          actions={<BadgeCheck className="size-5 text-(--gdg-green)" />}
+        >
           <div className="mt-4 space-y-3 text-sm text-muted-foreground">
             <p>
               <span className="font-semibold text-foreground">ID:</span> {verifyId}
@@ -120,7 +105,9 @@ export default async function CertificateDetailPage({
             </p>
             <p>
               <span className="font-semibold text-foreground">Status:</span>{" "}
-              {certificate.revokedAt ? "Revoked" : "Active"}
+              <StatusBadge tone={certificate.revokedAt ? "revoked" : "active"}>
+                {certificate.revokedAt ? "Revoked" : "Active"}
+              </StatusBadge>
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -128,15 +115,14 @@ export default async function CertificateDetailPage({
               certId={verifyId}
               revokedAt={certificate.revokedAt?.toISOString() ?? null}
             />
-            <Link
-              href={verifyUrl}
-              className="inline-flex items-center gap-2 rounded-full border border-muted/50 px-3 py-1 text-xs font-semibold"
-            >
-              Open verification link
-              <ArrowUpRight className="size-4" />
-            </Link>
+            <Button asChild size="sm" variant="outline">
+              <Link href={verifyUrl}>
+                Open verification link
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </Button>
           </div>
-        </div>
+        </AdminSectionCard>
       </section>
     </div>
   );

@@ -1,9 +1,18 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { prisma } from "@/lib/prisma";
 import { CreateEventForm } from "@/components/admin/create-event-form";
-
-export const dynamic = "force-dynamic";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const formatDate = (value: Date) =>
   new Intl.DateTimeFormat("en-IN", {
@@ -45,82 +54,82 @@ export default async function AdminEventsPage() {
           { label: "Unique participants", value: uniqueParticipants.length },
           { label: "Most active branch", value: `${topBranchName} (${topBranchCount})` },
         ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-3xl border border-white/70 bg-white/80 p-4 shadow-sm"
-          >
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              {stat.label}
-            </p>
-            <p className="mt-3 text-2xl font-semibold text-foreground">
-              {stat.value}
-            </p>
-          </div>
+          <Card key={stat.label}>
+            <CardContent className="p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                {stat.label}
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">
+                {stat.value}
+              </p>
+            </CardContent>
+          </Card>
         ))}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Events
-              </p>
-              <h1 className="mt-2 font-heading text-2xl text-foreground">
-                Manage chapter events
-              </h1>
-            </div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-(--gdg-blue)"
-            >
-              View public site
-              <ArrowUpRight className="size-4" />
-            </Link>
-          </div>
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full min-w-[720px] border-collapse text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  <th className="py-2">Event</th>
-                  <th>Date</th>
-                  <th>Venue</th>
-                  <th>Certificates</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-muted/40">
+        <AdminSectionCard
+          eyebrow="Events"
+          title="Manage chapter events"
+          titleClassName="text-2xl"
+          actions={
+            <Button asChild variant="link" className="h-auto px-0 text-(--gdg-blue)">
+              <Link href="/">
+                View public site
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </Button>
+          }
+        >
+          <div className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Event</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Venue</TableHead>
+                  <TableHead>Certificates</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {events.map((event) => (
-                  <tr key={event.id} className="text-foreground">
-                    <td className="py-3">
+                  <TableRow key={event.id}>
+                    <TableCell>
                       <div className="font-semibold">{event.name}</div>
                       <div className="text-xs text-muted-foreground">
                         {event.description ?? "No description"}
                       </div>
-                    </td>
-                    <td>{formatDate(event.eventDate)}</td>
-                    <td>{event.venue ?? "-"}</td>
-                    <td>{event._count.certificates}</td>
-                    <td className="text-right">
-                      <Link
-                        href={`/admin/events/${event.id}`}
-                        className="inline-flex items-center gap-2 rounded-full border border-muted/50 px-3 py-1 text-xs font-semibold"
-                      >
-                        Open
-                        <ArrowUpRight className="size-4" />
-                      </Link>
-                    </td>
-                  </tr>
+                    </TableCell>
+                    <TableCell>{formatDate(event.eventDate)}</TableCell>
+                    <TableCell>{event.venue ?? "-"}</TableCell>
+                    <TableCell>{event._count.certificates}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/admin/events/${event.id}/certificates`}>
+                            Records
+                          </Link>
+                        </Button>
+                        <Button asChild size="sm">
+                          <Link href={`/admin/events/${event.id}`}>
+                            Issuance
+                            <ArrowUpRight className="size-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             {!events.length ? (
-              <p className="py-6 text-center text-sm text-muted-foreground">
+              <p className="py-2 text-center text-sm text-muted-foreground">
                 No events yet. Create your first event.
               </p>
             ) : null}
           </div>
-        </div>
+        </AdminSectionCard>
 
         <CreateEventForm />
       </section>

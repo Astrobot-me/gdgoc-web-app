@@ -1,5 +1,6 @@
 import QRCode from "qrcode";
 import { createRequire } from "node:module";
+import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { CertIdParamSchema } from "@/lib/validation";
 import type { NextRequest } from "next/server";
@@ -10,9 +11,9 @@ type CertificateImageParams = {
 
 type CanvasModule = typeof import("@napi-rs/canvas");
 
-type CertificateWithEvent = Awaited<
-  ReturnType<typeof prisma.certificate.findFirst>
->;
+type CertificateWithEvent = Prisma.CertificateGetPayload<{
+  include: { event: true };
+}>;
 
 export const runtime = "nodejs";
 
@@ -22,8 +23,13 @@ const BORDER_HEIGHT = 8;
 const CACHE_CONTROL = "public, max-age=3600, stale-while-revalidate=86400";
 const require = createRequire(import.meta.url);
 
+type TextDrawingContext = {
+  measureText: (text: string) => { width: number };
+  fillText: (text: string, x: number, y: number) => void;
+};
+
 const drawWrappedText = (
-  ctx: CanvasRenderingContext2D,
+  ctx: TextDrawingContext,
   text: string,
   x: number,
   y: number,
@@ -228,8 +234,9 @@ const renderPngCertificate = async ({
   ctx.fillText(`Certificate ID: ${verifyId}`, 60, CANVAS_HEIGHT - 80);
 
   const buffer = canvas.toBuffer("image/png");
+  const body = new Uint8Array(buffer);
 
-  return new Response(buffer, {
+  return new Response(body, {
     status: 200,
     headers: {
       "Content-Type": "image/png",

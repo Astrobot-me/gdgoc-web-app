@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { CalendarDays, Home, Users } from "lucide-react";
-import { SignOutButton } from "@/components/admin/sign-out-button";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminTopbar } from "@/components/admin/admin-topbar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -8,49 +8,14 @@ type AdminLayoutProps = {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fef3c7,transparent_45%),linear-gradient(160deg,#f8fafc,#ffffff)]">
-      <div className="mx-auto flex w-full max-w-6xl gap-6 px-6 py-8">
-        <aside className="hidden w-64 flex-col gap-6 rounded-3xl border border-white/70 bg-white/80 p-6 shadow-sm backdrop-blur lg:flex">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Admin console
-            </p>
-            <h2 className="mt-2 font-heading text-xl text-foreground">
-              GDG Certificates
-            </h2>
-          </div>
-          <nav className="flex flex-col gap-2 text-sm">
-            <Link
-              href="/admin/events"
-              className="flex items-center gap-2 rounded-2xl border border-muted/50 px-3 py-2 font-semibold text-foreground"
-            >
-              <CalendarDays className="size-4" />
-              Events
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center gap-2 rounded-2xl border border-transparent px-3 py-2 text-muted-foreground hover:border-muted/50 hover:text-foreground"
-            >
-              <Home className="size-4" />
-              Public site
-            </Link>
-          </nav>
-          <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-            <span>Admin access</span>
-            <SignOutButton />
-          </div>
-        </aside>
-        <div className="flex-1 space-y-6">
-          <div className="flex items-center justify-between rounded-3xl border border-white/70 bg-white/80 px-4 py-3 shadow-sm backdrop-blur lg:hidden">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Users className="size-4" />
-              Admin console
-            </div>
-            <SignOutButton />
-          </div>
-          {children}
-        </div>
-      </div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(251,188,4,0.16),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(66,133,244,0.12),_transparent_24%),linear-gradient(180deg,#f8fafc,#f5f7fb)] text-foreground dark:bg-[radial-gradient(circle_at_top,_rgba(66,133,244,0.18),_transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(52,168,83,0.12),_transparent_24%),linear-gradient(180deg,#07111d,#0f172a)]">
+      <SidebarProvider>
+        <AdminSidebar />
+        <SidebarInset>
+          <AdminTopbar />
+          <main className="flex-1 p-4 lg:p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 }

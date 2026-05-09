@@ -3,7 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type FormState = {
   name: string;
@@ -59,57 +64,70 @@ export function CreateEventForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="grid gap-3 rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm"
-    >
-      <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Create event
-        </p>
-        <h2 className="mt-2 font-heading text-2xl text-foreground">
-          Add a new GDG event
-        </h2>
-      </div>
-      <input
-        value={form.name}
-        onChange={(event) => updateField("name", event.target.value)}
-        placeholder="Event name"
-        className="h-11 rounded-2xl border border-muted/60 bg-white px-3 text-sm"
-        required
-      />
-      <div className="grid gap-3 md:grid-cols-2">
-        <input
-          value={form.eventDate}
-          onChange={(event) => updateField("eventDate", event.target.value)}
-          type="date"
-          className="h-11 rounded-2xl border border-muted/60 bg-white px-3 text-sm"
-          required
-        />
-        <input
-          value={form.venue}
-          onChange={(event) => updateField("venue", event.target.value)}
-          placeholder="Venue (optional)"
-          className="h-11 rounded-2xl border border-muted/60 bg-white px-3 text-sm"
-        />
-      </div>
-      <textarea
-        value={form.description}
-        onChange={(event) => updateField("description", event.target.value)}
-        placeholder="Short description (optional)"
-        className="min-h-[96px] rounded-2xl border border-muted/60 bg-white px-3 py-2 text-sm"
-      />
-      <input
-        value={form.bannerUrl}
-        onChange={(event) => updateField("bannerUrl", event.target.value)}
-        placeholder="Banner URL (optional)"
-        className="h-11 rounded-2xl border border-muted/60 bg-white px-3 text-sm"
-      />
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      <Button type="submit" size="lg" disabled={isPending} className="gap-2">
-        Add event
-        <Plus className="size-4" />
-      </Button>
+    <form onSubmit={handleSubmit}>
+      <AdminSectionCard eyebrow="Create event" title="Add a new GDG event">
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="event-name">Event name</Label>
+            <Input
+              id="event-name"
+              value={form.name}
+              onChange={(event) => updateField("name", event.target.value)}
+              placeholder="Event name"
+              required
+            />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="event-date">Event date</Label>
+              <Input
+                id="event-date"
+                value={form.eventDate}
+                onChange={(event) => updateField("eventDate", event.target.value)}
+                type="date"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="event-venue">Venue</Label>
+              <Input
+                id="event-venue"
+                value={form.venue}
+                onChange={(event) => updateField("venue", event.target.value)}
+                placeholder="Venue (optional)"
+              />
+            </div>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="event-description">Description</Label>
+            <Textarea
+              id="event-description"
+              value={form.description}
+              onChange={(event) => updateField("description", event.target.value)}
+              placeholder="Short description (optional)"
+              className="min-h-[96px]"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="event-banner">Banner URL</Label>
+            <Input
+              id="event-banner"
+              value={form.bannerUrl}
+              onChange={(event) => updateField("bannerUrl", event.target.value)}
+              placeholder="Banner URL (optional)"
+            />
+          </div>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          <Button type="submit" size="lg" disabled={isPending} className="gap-2">
+            Add event
+            <Plus className="size-4" />
+          </Button>
+        </div>
+      </AdminSectionCard>
     </form>
   );
 }

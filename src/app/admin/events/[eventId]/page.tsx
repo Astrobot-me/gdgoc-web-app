@@ -1,29 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight, CalendarDays } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { UploadPanel } from "@/components/admin/upload-panel";
+import { ArrowRight, BarChart3, Rows3 } from "lucide-react";
+import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { SingleCertificateForm } from "@/components/admin/single-certificate-form";
-import { CertificateTable } from "@/components/admin/certificate-table";
-import { EventAnalytics } from "@/components/admin/event-analytics";
+import { UploadPanel } from "@/components/admin/upload-panel";
+import { prisma } from "@/lib/prisma";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
-export const dynamic = "force-dynamic";
-
-type EventDetailProps = {
+type EventIssuancePageProps = {
   params: Promise<{ eventId: string }>;
 };
 
-const formatDate = (value: Date) =>
-  new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(value);
-
-const formatDateKey = (value: Date) =>
-  value.toISOString().slice(0, 10);
-
-export default async function AdminEventDetailPage({ params }: EventDetailProps) {
+export default async function AdminEventIssuancePage({
+  params,
+}: EventIssuancePageProps) {
   const { eventId } = await params;
   const event = await prisma.event.findUnique({ where: { id: eventId } });
 
@@ -31,155 +22,95 @@ export default async function AdminEventDetailPage({ params }: EventDetailProps)
     notFound();
   }
 
-  const certificates = await prisma.certificate.findMany({
-    where: { eventId },
-    orderBy: { issuedAt: "desc" },
-  });
-
-  const branchMap = new Map<string, number>();
-  const issuedMap = new Map<string, number>();
-  let revokedCount = 0;
-
-  for (const cert of certificates) {
-    branchMap.set(cert.branch, (branchMap.get(cert.branch) ?? 0) + 1);
-    const issuedKey = formatDateKey(cert.issuedAt);
-    issuedMap.set(issuedKey, (issuedMap.get(issuedKey) ?? 0) + 1);
-    if (cert.revokedAt) {
-      revokedCount += 1;
-    }
-  }
-
-  const branchMetrics = Array.from(branchMap.entries()).map(([branch, count]) => ({
-    branch,
-    count,
-  }));
-  const issuedMetrics = Array.from(issuedMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, count]) => ({ date, count }));
-
-  const statusMetrics = [
-    { label: "Active", count: certificates.length - revokedCount },
-    { label: "Revoked", count: revokedCount },
-  ];
-
-  const since = new Date();
-  since.setDate(since.getDate() - 30);
-
-  const verifyLogs = await prisma.verificationLog.findMany({
-    where: { eventId, createdAt: { gte: since } },
-    select: { createdAt: true },
-  });
-
-  const verifyMap = new Map<string, number>();
-  for (const log of verifyLogs) {
-    const key = formatDateKey(log.createdAt);
-    verifyMap.set(key, (verifyMap.get(key) ?? 0) + 1);
-  }
-
-  const verifyMetrics = Array.from(verifyMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, count]) => ({ date, count }));
+  const [certificateCount, revokedCount, branchesRepresented] = await Promise.all([
+    prisma.certificate.count({ where: { eventId } }),
+    prisma.certificate.count({ where: { eventId, revokedAt: { not: null } } }),
+    prisma.certificate.findMany({
+      where: { eventId },
+      distinct: ["branch"],
+      select: { branch: true },
+    }),
+  ]);
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Event detail
-            </p>
-            <h1 className="mt-2 font-heading text-2xl text-foreground">
-              {event.name}
-            </h1>
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-2">
-                <CalendarDays className="size-4" />
-                {formatDate(event.eventDate)}
-              </span>
-              <span>{event.venue ?? "RIT Roorkee"}</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <a
-              href={`/api/admin/events/${eventId}/export?format=csv`}
-              className="inline-flex items-center gap-2 rounded-full border border-muted/50 px-3 py-1 text-xs font-semibold"
-            >
-              Download CSV
-              <ArrowUpRight className="size-4" />
-            </a>
-            <Link
-              href="/admin/events"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-(--gdg-blue)"
-            >
-              Back to events
-              <ArrowUpRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-        {event.description ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            {event.description}
-          </p>
-        ) : null}
-      </section>
+    <div className="grid gap-6 xl:grid-cols-[minmax(22rem,26rem)_minmax(0,1fr)]">
+      <div className="grid gap-6">
+        <UploadPanel eventId={eventId} />
+        <SingleCertificateForm eventId={eventId} />
+      </div>
 
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="grid gap-6">
-          <UploadPanel eventId={eventId} />
-          <SingleCertificateForm eventId={eventId} />
-        </div>
-        <div className="rounded-3xl border border-muted/50 bg-white/80 p-6 shadow-sm">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Summary
-          </p>
-          <h2 className="mt-2 font-heading text-xl text-foreground">
-            Event stats
-          </h2>
-          <div className="mt-4 grid gap-4">
+      <div className="grid gap-6">
+        <AdminSectionCard
+          eyebrow="Issuance workspace"
+          title="Keep certificate issuing focused"
+          description="This screen is only for creating and importing certificates. Records and analytics now live on their own routes."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
             {[
-              { label: "Total certificates", value: certificates.length },
+              { label: "Total certificates", value: certificateCount },
               {
                 label: "Active certificates",
-                value: certificates.length - revokedCount,
+                value: certificateCount - revokedCount,
               },
-              { label: "Revoked certificates", value: revokedCount },
-              { label: "Branches represented", value: branchMetrics.length },
+              { label: "Branches represented", value: branchesRepresented.length },
             ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-muted/50 bg-muted/20 px-4 py-3"
-              >
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {stat.label}
-                </p>
-                <p className="mt-2 text-xl font-semibold text-foreground">
-                  {stat.value}
-                </p>
-              </div>
+              <Card key={stat.label} className="rounded-2xl bg-muted/20 shadow-none">
+                <CardContent className="px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-foreground">
+                    {stat.value}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </AdminSectionCard>
 
-      <EventAnalytics
-        branchMetrics={branchMetrics}
-        issuedMetrics={issuedMetrics}
-        statusMetrics={statusMetrics}
-        verifyMetrics={verifyMetrics}
-      />
+        <section className="grid gap-4 lg:grid-cols-2">
+          <AdminSectionCard
+            eyebrow="Participant records"
+            title="Review the full issuance table"
+            description="Search, inspect, and revoke certificates without the forms competing for attention."
+          >
+            <Button asChild className="gap-2">
+              <Link href={`/admin/events/${eventId}/certificates`}>
+                Open records
+                <Rows3 className="size-4" />
+              </Link>
+            </Button>
+          </AdminSectionCard>
 
-      <CertificateTable
-        eventId={eventId}
-        rows={certificates.map((cert) => ({
-          id: cert.id,
-          credentialId: cert.credentialId,
-          holderName: cert.holderName,
-          rollNumber: cert.rollNumber,
-          branch: cert.branch,
-          issuedAt: formatDate(cert.issuedAt),
-          revokedAt: cert.revokedAt?.toISOString() ?? null,
-        }))}
-      />
+          <AdminSectionCard
+            eyebrow="Analytics"
+            title="Open the dedicated metrics screen"
+            description="Charts now use the full viewport instead of stacking underneath forms and tables."
+          >
+            <Button asChild variant="outline" className="gap-2">
+              <Link href={`/admin/events/${eventId}/analytics`}>
+                Open analytics
+                <BarChart3 className="size-4" />
+              </Link>
+            </Button>
+          </AdminSectionCard>
+        </section>
+
+        <AdminSectionCard
+          eyebrow="Export"
+          title="Download event data"
+          description="Generate a CSV export when you need an offline list of every certificate issued for this event."
+        >
+          <div className="flex flex-wrap gap-3">
+            <Button asChild size="sm" variant="outline">
+              <a href={`/api/admin/events/${eventId}/export?format=csv`}>
+                Download CSV
+                <ArrowRight className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </AdminSectionCard>
+      </div>
     </div>
   );
 }
