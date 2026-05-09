@@ -44,8 +44,8 @@ const formatDate = (value: string) =>
     year: "numeric",
   }).format(new Date(value));
 
-const getBaseUrl = () => {
-  const headerStore = headers();
+const getBaseUrl = async () => {
+  const headerStore = await headers();
   const host = headerStore.get("host");
   if (!host) {
     return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -56,7 +56,7 @@ const getBaseUrl = () => {
 
 export default async function VerifyPage({ params }: VerifyPageProps) {
   const { certId } = await params;
-  const baseUrl = getBaseUrl();
+  const baseUrl = await getBaseUrl();
   const verifyUrl = `${baseUrl}/verify/${certId}`;
 
   let response: Response | null = null;

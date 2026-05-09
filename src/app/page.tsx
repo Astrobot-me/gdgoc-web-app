@@ -53,12 +53,15 @@ export default async function Home() {
             <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr]">
               <div className="space-y-6">
                 <h1 className="text-balance font-heading text-4xl leading-tight text-foreground md:text-6xl">
-                  Certificate verification with proof, not guesswork.
+                  GDG on Campus, RIT Roorkee.
+                  <span className="block text-muted-foreground">
+                    Learn, build, and grow together.
+                  </span>
                 </h1>
                 <p className="max-w-xl text-lg text-muted-foreground">
-                  Instantly verify GDG on Campus certificates, explore event
-                  impact, and keep every credential trusted by recruiters and
-                  peers.
+                  A community for developers and builders across campus.
+                  Discover events, celebrate participation, and keep every
+                  achievement verifiable.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <Button asChild size="lg">
@@ -68,13 +71,12 @@ export default async function Home() {
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/verify">
+                    <Link href="#verify">
                       Verify a Certificate
                       <BadgeCheck className="size-4" />
                     </Link>
                   </Button>
                 </div>
-                <VerifyLookupForm />
               </div>
               <div className="grid gap-4 rounded-3xl border border-white/60 bg-white/70 p-6 shadow-lg backdrop-blur">
                 <div className="flex items-center justify-between">
@@ -106,8 +108,8 @@ export default async function Home() {
           <section className="grid gap-6 md:grid-cols-3">
             {[
               {
-                title: "Instant verification",
-                description: "Share a link or QR code and prove authenticity in seconds.",
+                title: "Community-led learning",
+                description: "Workshops, sessions, and study circles run by the chapter.",
                 icon: BadgeCheck,
                 tone: "text-(--gdg-blue)",
               },
@@ -118,7 +120,7 @@ export default async function Home() {
                 tone: "text-(--gdg-green)",
               },
               {
-                title: "Secure issuance",
+                title: "Verified achievements",
                 description: "Certificates are generated on demand and protected against tampering.",
                 icon: CalendarDays,
                 tone: "text-(--gdg-red)",
@@ -179,13 +181,45 @@ export default async function Home() {
             </div>
           </section>
 
+          <section
+            id="verify"
+            className="grid gap-6 rounded-3xl border border-white/70 bg-white/80 p-8 shadow-sm backdrop-blur lg:grid-cols-[1.1fr_0.9fr]"
+          >
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                Certificate verification
+              </p>
+              <h2 className="mt-3 font-heading text-3xl text-foreground">
+                Verify a certificate in seconds
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Use the certificate ID or QR code to confirm authenticity. This
+                keeps achievements trusted for employers, peers, and mentors.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <Button asChild size="lg">
+                  <Link href="/verify">
+                    Open verification page
+                    <ArrowUpRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link href={communityUrl} target="_blank" rel="noreferrer">
+                    Learn about GDG on Campus
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <VerifyLookupForm />
+          </section>
+
           <section className="flex flex-col items-center gap-6 rounded-3xl border border-white/70 bg-[linear-gradient(120deg,#ffffff,rgba(255,255,255,0.6),#fef3c7)] p-10 text-center shadow-sm">
             <h2 className="text-balance font-heading text-3xl text-foreground">
               Built for credible, community-first credentials.
             </h2>
             <p className="max-w-2xl text-sm text-muted-foreground">
-              Every certificate is a gateway into our chapter community. Verify
-              details, explore events, and connect with the GDG on Campus
+              Every certificate is a gateway into our chapter community. Meet
+              fellow builders, explore events, and connect with the GDG on Campus
               network.
             </p>
             <Button asChild size="lg">

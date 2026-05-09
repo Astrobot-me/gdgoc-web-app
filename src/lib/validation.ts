@@ -19,6 +19,14 @@ export const ExcelRowSchema = z.object({
 
 export const BulkUploadSchema = z.array(ExcelRowSchema).min(1).max(5000);
 
+export const CreateCertificateSchema = z.object({
+  credentialId: z.string().min(1).optional(),
+  holderName: z.string().min(1),
+  rollNumber: z.string().min(1),
+  branch: z.string().min(1),
+  issuedAt: z.coerce.date().optional(),
+});
+
 export const AdminLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
