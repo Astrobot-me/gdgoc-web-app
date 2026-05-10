@@ -95,25 +95,25 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-6 py-28 ">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-4 py-12 sm:px-6 sm:py-28 ">
       <main
         id="certifcate-card"
-        className="mx-auto flex w-full max-w-5xl flex-col gap-8 "
+        className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:gap-8 "
       >
-        <header className="flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/80 p-8 shadow-sm backdrop-blur">
-          <div className="flex items-center justify-between">
+        <header className="flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/80 p-6 sm:p-8 shadow-sm backdrop-blur">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 Certificate Verification
               </p>
-              <h1 className="mt-2 font-heading text-3xl text-foreground">
+              <h1 className="mt-2 font-heading text-2xl sm:text-3xl text-foreground">
                 {isValid && "Certificate verified"}
                 {isRevoked && "Certificate revoked"}
                 {!isValid && !isRevoked && "Certificate not found"}
               </h1>
             </div>
             <div
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${
                 isValid
                   ? "bg-(--gdg-green)/15 text-(--gdg-green)"
                   : "bg-(--gdg-red)/15 text-(--gdg-red)"
@@ -126,15 +126,15 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
             This page confirms the authenticity of a GDG on Campus certificate.
           </p>
 
-          <div className="rounded-xl ">
-                <Image src="/banner3.webp" alt="banner" width="1500" height="500"/>
+          <div className="overflow-hidden rounded-xl">
+                <Image src="/banner3.webp" alt="banner" width="1500" height="500" className="h-auto w-full object-cover"/>
           </div>
         </header>
 
         {!isValid && !isRevoked ? (
-          <section className="rounded-3xl border border-white/70 bg-white/80 p-10 text-center shadow-sm">
+          <section className="rounded-3xl border border-white/70 bg-white/80 p-8 sm:p-10 text-center shadow-sm">
             <AlertTriangle className="mx-auto size-10 text-(--gdg-red)" />
-            <h2 className="mt-4 font-heading text-2xl text-foreground">
+            <h2 className="mt-4 font-heading text-xl sm:text-2xl text-foreground">
               Certificate not found
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -142,13 +142,13 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
               team for help.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href={communityUrl} target="_blank" rel="noreferrer">
                   Contact the chapter
                   <ArrowUpRight className="size-4" />
                 </Link>
               </Button>
-              <ShareButton value={verifyUrl} />
+              <ShareButton value={verifyUrl} className="w-full sm:w-auto" />
             </div>
           </section>
         ) : (
@@ -166,61 +166,61 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                 </div>
               ) : null}
               <div className="mt-6 grid gap-4 text-sm">
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Credential ID</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold break-all text-foreground text-right sm:text-left">
                     {payload?.certificate.credentialId}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Certificate ID</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold break-all text-foreground text-right sm:text-left">
                     {payload?.certificate.certificateId}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Holder name</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.certificate.holderName}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Roll number</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.certificate.rollNumber}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Branch</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.certificate.branch}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Event</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.event.name}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Event date</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.event.eventDate
                       ? formatDate(payload.event.eventDate)
                       : "-"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Issued on</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     {payload?.certificate.issuedAt
                       ? formatDate(payload.certificate.issuedAt)
                       : "-"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-muted-foreground">Issued by</span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground text-right sm:text-left">
                     Google Developer Group RIT Roorkee
                   </span>
                 </div>
@@ -230,9 +230,9 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                   </div>
                 ) : null}
                 {payload?.event.venue ? (
-                  <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                  <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <span className="text-muted-foreground">Venue</span>
-                    <span className="font-semibold text-foreground">
+                    <span className="font-semibold text-foreground text-right sm:text-left">
                       {payload.event.venue}
                     </span>
                   </div>
@@ -243,15 +243,15 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                   </div>
                 ) : null}
               </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <ShareButton value={verifyUrl} />
-                <Button asChild variant="secondary">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <ShareButton value={verifyUrl} className="w-full sm:w-auto" />
+                <Button asChild variant="secondary" className="w-full sm:w-auto">
                   <Link href={communityUrl} target="_blank" rel="noreferrer">
                     Powered by GDG on Campus
                     <ArrowUpRight className="size-4" />
                   </Link>
                 </Button>
-                <DownloadCertificateButton certId={certId} />
+                <DownloadCertificateButton certId={certId} className="w-full sm:w-auto" />
               </div>
             </div>
 
@@ -286,7 +286,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
               ) : null}
 
               <div className="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-sm">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       Shareable QR
@@ -295,25 +295,25 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                       Scan to verify
                     </h4>
                   </div>
-                  <BadgeCheck className="size-6 text-(--gdg-green)" />
+                  <BadgeCheck className="hidden size-6 text-(--gdg-green) sm:block" />
                 </div>
-                <div className="mt-4 flex items-center gap-4">
+                <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                   <Image
                     src={qrCode}
                     alt="Verification QR code"
                     width={140}
                     height={140}
-                    className="rounded-2xl border border-muted/40 bg-white p-2"
+                    className="shrink-0 rounded-2xl border border-muted/40 bg-white p-2"
                     unoptimized
                   />
-                  <div>
+                  <div className="text-center sm:text-left">
                     <p className="text-sm text-muted-foreground">
                       Share this QR code alongside the certificate to let others
                       verify instantly.
                     </p>
                     <Link
                       href={verifyUrl}
-                      className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-(--gdg-blue)"
+                      className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-(--gdg-blue)"
                     >
                       Open verification link
                       <ArrowUpRight className="size-4" />

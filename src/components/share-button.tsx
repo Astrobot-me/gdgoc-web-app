@@ -8,7 +8,7 @@ type ShareButtonProps = {
   value: string;
 };
 
-export function ShareButton({ value }: ShareButtonProps) {
+export function ShareButton({ value, className }: ShareButtonProps & { className?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -22,7 +22,7 @@ export function ShareButton({ value }: ShareButtonProps) {
   };
 
   return (
-    <Button type="button" variant="outline" onClick={handleCopy}>
+    <Button type="button" variant="outline" onClick={handleCopy} className={className}>
       {copied ? (
         <>
           Copied

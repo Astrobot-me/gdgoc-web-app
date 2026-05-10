@@ -10,7 +10,8 @@ type DownloadCertificateButtonProps = {
 
 export function DownloadCertificateButton({
   certId,
-}: DownloadCertificateButtonProps) {
+  className,
+}: DownloadCertificateButtonProps & { className?: string }) {
   const handleDownload = async () => {
     const certificateCard = document.getElementById("certifcate-card");
 
@@ -25,7 +26,7 @@ export function DownloadCertificateButton({
   };
 
   return (
-    <Button type="button" variant="outline" onClick={handleDownload}>
+    <Button type="button" variant="outline" onClick={handleDownload} className={className}>
       Download Certificate
       <ArrowUpRight className="size-4" />
     </Button>
