@@ -23,9 +23,8 @@ export const metadata: Metadata = {
 	title: "GDG on Campus - Certificate Verification",
 	description:
 		"Verify GDG on Campus certificates from Roorkee Institute of Technology.",
-	manifest : { 
-		
-	}
+		applicationName : "GDG RIT Roorkee"
+	
 };
 
 export default function RootLayout({

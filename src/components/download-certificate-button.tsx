@@ -18,8 +18,8 @@ export function DownloadCertificateButton({
       return;
     }
 
-    const el : HTMLElement = document.getElementById("certificate-card");
-    console.log(el.scrollWidth, el.scrollHeight, el.getBoundingClientRect());
+    // const el : HTMLElement = document.getElementById("certificate-card");
+    // console.log(el.scrollWidth, el.scrollHeight, el.getBoundingClientRect());
 
     await snapshotDiv(certificateCard, `GDG-Certificate-${certId}.png`);
   };
