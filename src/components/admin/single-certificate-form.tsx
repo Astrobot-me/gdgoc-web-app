@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { BadgePlus } from "lucide-react";
+import { BadgePlus, LoaderIcon } from "lucide-react";
 import { toast } from "sonner";
 import { CreateCertificateSchema } from "@/lib/validation";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
@@ -196,8 +196,17 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
             </Alert>
           ) : null}
           <Button type="submit" size="lg" disabled={isPending} className="gap-2">
-            Add certificate
+            {
+              isPending ? (
+               <LoaderIcon className="animate-spin"/>
+              ) :(
+                 <>
+                 Add certificate
             <BadgePlus className="size-4" />
+                </>
+                
+              )
+            }
           </Button>
         </div>
       </AdminSectionCard>

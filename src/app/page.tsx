@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, CalendarDays, Users } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VerifyLookupForm } from "@/components/verify-lookup-form";
 
@@ -8,30 +7,15 @@ const communityUrl =
   process.env.GDG_COMMUNITY_URL ??
   "https://gdg.community.dev/gdg-on-campus-roorkee-institute-of-technology-roorkee-india";
 
-const formatDate = (value: Date) =>
-  new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(value);
+// const formatDate = (value: Date) =>
+//   new Intl.DateTimeFormat("en-IN", {
+//     day: "2-digit",
+//     month: "short",
+//     year: "numeric",
+//   }).format(value);
 
 export default async function Home() {
-  const [eventsCount, certificatesCount, uniqueParticipants, recentEvents] =
-    await Promise.all([
-      prisma.event.count(),
-      prisma.certificate.count(),
-      prisma.certificate.findMany({
-        distinct: ["rollNumber"],
-        select: { rollNumber: true },
-      }),
-      prisma.event.findMany({
-        orderBy: { eventDate: "desc" },
-        take: 3,
-        include: { _count: { select: { certificates: true } } },
-      }),
-    ]);
-
-  const participantCount = uniqueParticipants.length;
+  
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fef3c7,transparent_48%),radial-gradient(circle_at_20%_40%,#dbeafe,transparent_45%),linear-gradient(120deg,#f8fafc,white_40%,#fefce8)]">
@@ -88,57 +72,22 @@ export default async function Home() {
                 <div className="grid gap-5">
                   <div className="flex items-center justify-between text-2xl font-semibold">
                     <span>Total events</span>
-                    <span>{eventsCount}</span>
+                    <span>7+</span>
                   </div>
                   <div className="flex items-center justify-between text-2xl font-semibold">
                     <span>Certificates issued</span>
-                    <span>{certificatesCount}</span>
+                    <span>200+</span>
                   </div>
                   <div className="flex items-center justify-between text-2xl font-semibold">
                     <span>Unique participants</span>
-                    <span>{participantCount}</span>
+                    <span>300+</span>
                   </div>
                 </div>
               </div>
             </div>
           </header>
 
-          <section className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                title: "Community-led learning",
-                description: "Workshops, sessions, and study circles run by the chapter.",
-                icon: BadgeCheck,
-                tone: "text-(--gdg-blue)",
-              },
-              {
-                title: "Event analytics",
-                description: "Track participation, branch diversity, and engagement trends.",
-                icon: Users,
-                tone: "text-(--gdg-green)",
-              },
-              {
-                title: "Verified achievements",
-                description: "Certificates are generated on demand and protected against tampering.",
-                icon: CalendarDays,
-                tone: "text-(--gdg-red)",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur"
-              >
-                <item.icon className={`mb-4 size-8 ${item.tone}`} />
-                <h3 className="font-heading text-xl text-foreground">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </section>
-
+         
           <section className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-sm backdrop-blur">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -156,7 +105,7 @@ export default async function Home() {
                 </Link>
               </Button>
             </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {/* <div className="mt-6 grid gap-4 md:grid-cols-3">
               {recentEvents.map((event) => (
                 <div
                   key={event.id}
@@ -176,7 +125,7 @@ export default async function Home() {
                   </p>
                 </div>
               ))}
-            </div>
+            </div> */}
           </section>
 
           <section

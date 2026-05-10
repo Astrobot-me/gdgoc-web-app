@@ -92,7 +92,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-6 py-12">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-6 py-28">
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-8">
         <header className="flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/80 p-8 shadow-sm backdrop-blur">
           <div className="flex items-center justify-between">
@@ -119,6 +119,10 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
           <p className="text-sm text-muted-foreground">
             This page confirms the authenticity of a GDG on Campus certificate.
           </p>
+
+          <div className="rounded-xl ">
+                <Image src="/banner.webp" alt="banner" width="1500" height="500"/>
+          </div>
         </header>
 
         {!isValid && !isRevoked ? (
@@ -206,6 +210,12 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                     {payload?.certificate.issuedAt
                       ? formatDate(payload.certificate.issuedAt)
                       : "-"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                  <span className="text-muted-foreground">Issued by</span>
+                  <span className="font-semibold text-foreground">
+                    Google Developer Group RIT Roorkee
                   </span>
                 </div>
                 {payload?.certificate.description ? (
