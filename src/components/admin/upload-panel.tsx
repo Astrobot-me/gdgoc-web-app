@@ -15,7 +15,7 @@ type UploadResult = {
 };
 
 type UploadPanelProps = {
-  eventId: string;
+  eventId: number;
 };
 
 export function UploadPanel({ eventId }: UploadPanelProps) {

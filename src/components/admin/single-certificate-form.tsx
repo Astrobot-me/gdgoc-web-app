@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "../ui/textarea";
 
 type FormState = {
   credentialId: string;
@@ -16,6 +17,8 @@ type FormState = {
   rollNumber: string;
   branch: string;
   issuedAt: string;
+  description : string; 
+  type : "PARTICIPANT" | "WINNER"; 
 };
 
 const initialState: FormState = {
@@ -24,10 +27,13 @@ const initialState: FormState = {
   rollNumber: "",
   branch: "",
   issuedAt: "",
+  description : "",
+  type : "PARTICIPANT"
 };
 
 type SingleCertificateFormProps = {
-  eventId: string;
+  eventId: number
+  ;
 };
 
 export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
@@ -137,6 +143,19 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
                 onChange={(event) => updateField("issuedAt", event.target.value)}
                 type="date"
               />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="issued-at">Type</Label>
+              <Textarea
+                id="issued-at"
+                value={form.description}
+                onChange={(event) => updateField("description", event.target.value)}
+                // type="text"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="issued-at">Issued date</Label>
+              
             </div>
           </div>
           {error ? (

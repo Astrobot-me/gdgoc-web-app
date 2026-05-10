@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 type EventIssuancePageProps = {
-  params: Promise<{ eventId: string }>;
+  params: Promise<{ eventId: number }>;
 };
 
 export default async function AdminEventIssuancePage({

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 type EventWorkspaceLayoutProps = {
   children: React.ReactNode;
-  params: Promise<{ eventId: string }>;
+  params: Promise<{ eventId: number }>;
 };
 
 const formatDate = (value: Date) =>

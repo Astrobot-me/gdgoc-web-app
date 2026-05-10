@@ -13,31 +13,32 @@ datasource db {
 }
 
 model Event {
-  id            String           @id @default(uuid())
-  name          String
-  description   String?
-  eventDate     DateTime
-  venue         String?
-  bannerUrl     String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  certificates  Certificate[]
-  verifyLogs    VerificationLog[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  description  String?
+  eventDate    DateTime
+  venue        String?
+  bannerUrl    String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  certificates Certificate[]
+  verifyLogs   VerificationLog[]
 }
 
 model Certificate {
-  id              String            @id @default(uuid())
-  credentialId    String?           @unique
-  eventId         String
+  id    Int            @id @default(autoincrement())
+  credentialId String @default(nanoid()) @unique
+  certificateId   String            @unique
+  eventId         Int
   holderName      String
   rollNumber      String
   branch          String
+  description     String?
   certificateType CertificateType   @default(PARTICIPATION)
-  distinction     String?
   issuedAt        DateTime          @default(now())
   revokedAt       DateTime?
   createdAt       DateTime          @default(now())
-  event           Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event           Event             @relation(fields: [eventId], references: [id])
   verifyLogs      VerificationLog[]
 
   @@index([eventId])
@@ -47,15 +48,15 @@ model Certificate {
 }
 
 model VerificationLog {
-  id         String              @id @default(uuid())
-  certId     String?
-  eventId    String?
-  status     VerificationStatus
-  userAgent  String?
-  referer    String?
-  createdAt  DateTime            @default(now())
-  certificate Certificate?       @relation(fields: [certId], references: [id])
-  event      Event?              @relation(fields: [eventId], references: [id])
+  id          String             @id @default(nanoid())
+  certId      String?
+  eventId     Int?
+  status      VerificationStatus
+  userAgent   String?
+  referer     String?
+  createdAt   DateTime           @default(now())
+  certificate Certificate?       @relation(fields: [certId], references: [credentialId])
+  event       Event?             @relation(fields: [eventId], references: [id])
 
   @@index([certId])
   @@index([eventId])
