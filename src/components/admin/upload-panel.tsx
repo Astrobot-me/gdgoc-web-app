@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { UploadCloud } from "lucide-react";
+import { toast } from "sonner";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function UploadPanel({ eventId }: UploadPanelProps) {
 
     if (!file) {
       setError("Select a spreadsheet file to upload.");
+      toast.error("Select a spreadsheet file to upload.");
       return;
     }
 
@@ -45,11 +47,13 @@ export function UploadPanel({ eventId }: UploadPanelProps) {
 
       if (!response.ok) {
         setError("Upload failed. Please check the file format.");
+        toast.error("Upload failed. Please check the file format.");
         return;
       }
 
       const data = (await response.json()) as UploadResult;
       setResult(data);
+      toast.success("Upload completed.");
     });
   };
 
@@ -58,7 +62,7 @@ export function UploadPanel({ eventId }: UploadPanelProps) {
       <AdminSectionCard
         eyebrow="Bulk upload"
         title="Import participants"
-        description="Upload .xlsx, .xls, or .csv with Credential ID, Name, Branch, and Roll Number columns."
+        description="Upload .xlsx, .xls, or .csv with Certificate ID, Name, Branch, and Roll Number columns. Credential ID is optional."
       >
         <div className="grid gap-4">
           <div className="grid gap-2">

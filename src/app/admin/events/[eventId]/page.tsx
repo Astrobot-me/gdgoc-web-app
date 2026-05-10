@@ -9,24 +9,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 type EventIssuancePageProps = {
-  params: Promise<{ eventId: number }>;
+  params: Promise<{ eventId: string }>;
 };
 
 export default async function AdminEventIssuancePage({
   params,
 }: EventIssuancePageProps) {
   const { eventId } = await params;
-  const event = await prisma.event.findUnique({ where: { id: eventId } });
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    notFound();
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventIdValue },
+  });
 
   if (!event) {
     notFound();
   }
 
   const [certificateCount, revokedCount, branchesRepresented] = await Promise.all([
-    prisma.certificate.count({ where: { eventId } }),
-    prisma.certificate.count({ where: { eventId, revokedAt: { not: null } } }),
+    prisma.certificate.count({ where: { eventId: eventIdValue } }),
+    prisma.certificate.count({
+      where: { eventId: eventIdValue, revokedAt: { not: null } },
+    }),
     prisma.certificate.findMany({
-      where: { eventId },
+      where: { eventId: eventIdValue },
       distinct: ["branch"],
       select: { branch: true },
     }),
@@ -35,8 +44,8 @@ export default async function AdminEventIssuancePage({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(22rem,26rem)_minmax(0,1fr)]">
       <div className="grid gap-6">
-        <UploadPanel eventId={eventId} />
-        <SingleCertificateForm eventId={eventId} />
+        <UploadPanel eventId={eventIdValue} />
+        <SingleCertificateForm eventId={eventIdValue} />
       </div>
 
       <div className="grid gap-6">
@@ -75,7 +84,7 @@ export default async function AdminEventIssuancePage({
             description="Search, inspect, and revoke certificates without the forms competing for attention."
           >
             <Button asChild className="gap-2">
-              <Link href={`/admin/events/${eventId}/certificates`}>
+              <Link href={`/admin/events/${eventIdValue}/certificates`}>
                 Open records
                 <Rows3 className="size-4" />
               </Link>
@@ -88,7 +97,7 @@ export default async function AdminEventIssuancePage({
             description="Charts now use the full viewport instead of stacking underneath forms and tables."
           >
             <Button asChild variant="outline" className="gap-2">
-              <Link href={`/admin/events/${eventId}/analytics`}>
+              <Link href={`/admin/events/${eventIdValue}/analytics`}>
                 Open analytics
                 <BarChart3 className="size-4" />
               </Link>
@@ -103,7 +112,7 @@ export default async function AdminEventIssuancePage({
         >
           <div className="flex flex-wrap gap-3">
             <Button asChild size="sm" variant="outline">
-              <a href={`/api/admin/events/${eventId}/export?format=csv`}>
+              <a href={`/api/admin/events/${eventIdValue}/export?format=csv`}>
                 Download CSV
                 <ArrowRight className="size-4" />
               </a>

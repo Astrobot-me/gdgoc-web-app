@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type VerifyLookupFormProps = {
   placeholder?: string;
 };
 
 export function VerifyLookupForm({
-  placeholder = "Enter certificate ID",
+  placeholder = "Enter credential ID or certificate ID",
 }: VerifyLookupFormProps) {
   const router = useRouter();
   const [value, setValue] = useState("");
@@ -33,12 +34,12 @@ export function VerifyLookupForm({
         Verify a certificate
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <input
+        <Input
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder={placeholder}
-          className="h-11 flex-1 rounded-xl border border-muted/60 bg-white px-3 text-sm text-foreground outline-none transition focus:border-[color:var(--gdg-blue)] focus:ring-2 focus:ring-[color:var(--gdg-blue)]/30"
-          aria-label="Certificate ID"
+          className="h-11 flex-1"
+          aria-label="Credential ID or certificate ID"
         />
         <Button type="submit" size="lg" className="gap-2">
           Verify

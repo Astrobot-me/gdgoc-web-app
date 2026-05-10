@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const bodyFont = Manrope({
@@ -50,6 +51,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <Toaster />
       </body>
     </html>
   );

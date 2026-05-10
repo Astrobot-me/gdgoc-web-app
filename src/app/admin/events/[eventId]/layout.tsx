@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 type EventWorkspaceLayoutProps = {
   children: React.ReactNode;
-  params: Promise<{ eventId: number }>;
+  params: Promise<{ eventId: string }>;
 };
 
 const formatDate = (value: Date) =>
@@ -23,8 +23,12 @@ export default async function EventWorkspaceLayout({
   params,
 }: EventWorkspaceLayoutProps) {
   const { eventId } = await params;
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    notFound();
+  }
   const event = await prisma.event.findUnique({
-    where: { id: eventId },
+    where: { id: eventIdValue },
     include: { _count: { select: { certificates: true } } },
   });
 
@@ -45,13 +49,13 @@ export default async function EventWorkspaceLayout({
         actions={
           <>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/admin/events/${eventId}/certificates`}>
+              <Link href={`/admin/events/${eventIdValue}/certificates`}>
                 Participant records
                 <ArrowUpRight className="size-4" />
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/admin/events/${eventId}/analytics`}>
+              <Link href={`/admin/events/${eventIdValue}/analytics`}>
                 Analytics
                 <ArrowUpRight className="size-4" />
               </Link>

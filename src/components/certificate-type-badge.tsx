@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 type CertificateTypeBadgeProps = {
   certificateType: CertificateTypeValue;
-  distinction?: string | null;
+  label?: string | null;
   className?: string;
 };
 
@@ -19,11 +19,13 @@ const participantPalette =
 
 export function CertificateTypeBadge({
   certificateType,
-  distinction,
+  label,
   className,
 }: CertificateTypeBadgeProps) {
   const isWinner = certificateType === "WINNER";
-  const label = isWinner ? distinction || certificateTypeLabels.WINNER : certificateTypeLabels.PARTICIPATION;
+  const badgeLabel = isWinner
+    ? label || certificateTypeLabels.WINNER
+    : certificateTypeLabels.PARTICIPATION;
   const Icon = isWinner ? Medal : Users;
 
   return (
@@ -36,16 +38,16 @@ export function CertificateTypeBadge({
       )}
     >
       <Icon className="size-3.5" />
-      {label}
+      {badgeLabel}
     </Badge>
   );
 }
 
 export function CertificateAwardMarker({
-  distinction,
+  label,
   className,
 }: {
-  distinction?: string | null;
+  label?: string | null;
   className?: string;
 }) {
   return (
@@ -56,7 +58,7 @@ export function CertificateAwardMarker({
       )}
     >
       <Award className="size-4" />
-      {distinction || "Winner"}
+      {label || certificateTypeLabels.WINNER}
     </div>
   );
 }

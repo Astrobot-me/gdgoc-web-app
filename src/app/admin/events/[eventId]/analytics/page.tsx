@@ -14,14 +14,20 @@ export default async function EventAnalyticsPage({
   params,
 }: EventAnalyticsPageProps) {
   const { eventId } = await params;
-  const event = await prisma.event.findUnique({ where: { id: eventId } });
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    notFound();
+  }
+  const event = await prisma.event.findUnique({
+    where: { id: eventIdValue },
+  });
 
   if (!event) {
     notFound();
   }
 
   const certificates = await prisma.certificate.findMany({
-    where: { eventId },
+    where: { eventId: eventIdValue },
     orderBy: { issuedAt: "desc" },
   });
 
@@ -55,7 +61,7 @@ export default async function EventAnalyticsPage({
   since.setDate(since.getDate() - 30);
 
   const verifyLogs = await prisma.verificationLog.findMany({
-    where: { eventId, createdAt: { gte: since } },
+    where: { eventId: eventIdValue, createdAt: { gte: since } },
     select: { createdAt: true },
   });
 

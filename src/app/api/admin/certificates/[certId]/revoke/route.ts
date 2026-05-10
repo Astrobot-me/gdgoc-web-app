@@ -21,7 +21,7 @@ export async function POST(
   }
 
   const certificate = await prisma.certificate.findFirst({
-    where: { OR: [{ id: certId }, { credentialId: certId }] },
+    where: { OR: [{ credentialId: certId }, { certificateId: certId }] },
   });
 
   if (!certificate) {
@@ -39,8 +39,8 @@ export async function POST(
 
   return NextResponse.json({
     certificate: {
-      id: updated.id,
       credentialId: updated.credentialId,
+      certificateId: updated.certificateId,
       revokedAt: updated.revokedAt,
     },
   });

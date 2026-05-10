@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
+import { CertificateTypeBadge } from "@/components/certificate-type-badge";
 import { prisma } from "@/lib/prisma";
 import { ShareButton } from "@/components/share-button";
 import { RevokeButton } from "@/components/admin/revoke-button";
@@ -27,10 +27,14 @@ export default async function CertificateDetailPage({
   params,
 }: CertificateDetailProps) {
   const { eventId, certId } = await params;
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    notFound();
+  }
   const certificate = await prisma.certificate.findFirst({
     where: {
-      eventId,
-      OR: [{ id: certId }, { credentialId: certId }],
+      eventId: eventIdValue,
+      OR: [{ credentialId: certId }, { certificateId: certId }],
     },
     include: { event: true },
   });
@@ -39,9 +43,11 @@ export default async function CertificateDetailPage({
     notFound();
   }
 
-  const verifyId = certificate.credentialId ?? certificate.id;
+  const verifyId = certificate.credentialId;
   const baseUrl = getBaseUrl();
   const verifyUrl = `${baseUrl}/verify/${verifyId}`;
+  const awardLabel =
+    certificate.certificateType === "WINNER" ? certificate.description : undefined;
 
   return (
     <div className="space-y-6">
@@ -52,7 +58,7 @@ export default async function CertificateDetailPage({
         description={`${certificate.event.name} • ${formatDate(certificate.event.eventDate)}`}
         actions={
           <Button asChild variant="link" className="h-auto px-0 text-(--gdg-blue)">
-            <Link href={`/admin/events/${eventId}/certificates`}>
+            <Link href={`/admin/events/${eventIdValue}/certificates`}>
               Back to records
               <ArrowUpRight className="size-4" />
             </Link>
@@ -61,39 +67,29 @@ export default async function CertificateDetailPage({
       />
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <AdminSectionCard title="Certificate preview">
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border/60 bg-background/70">
-            <Image
-              src={`${baseUrl}/api/certificate/${verifyId}/image`}
-              alt="Certificate preview"
-              width={1200}
-              height={850}
-              className="h-auto w-full"
-              unoptimized
-            />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button asChild size="sm" variant="outline">
-              <a href={`${baseUrl}/api/certificate/${verifyId}/image`} download>
-                Download image
-                <ArrowUpRight className="size-4" />
-              </a>
-            </Button>
-            <ShareButton value={verifyUrl} />
-          </div>
-        </AdminSectionCard>
-
         <AdminSectionCard
-          title="Certificate status"
+          title="Certificate info"
           actions={<BadgeCheck className="size-5 text-(--gdg-green)" />}
         >
           <div className="mt-4 space-y-3 text-sm text-muted-foreground">
             <p>
-              <span className="font-semibold text-foreground">ID:</span> {verifyId}
+              <span className="font-semibold text-foreground">Credential ID:</span>{" "}
+              {certificate.credentialId}
             </p>
             <p>
-              <span className="font-semibold text-foreground">Roll number:</span>
-              {" "}{certificate.rollNumber}
+              <span className="font-semibold text-foreground">Certificate ID:</span>{" "}
+              {certificate.certificateId}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground">Type:</span>
+              <CertificateTypeBadge
+                certificateType={certificate.certificateType}
+                label={awardLabel}
+              />
+            </div>
+            <p>
+              <span className="font-semibold text-foreground">Roll number:</span>{" "}
+              {certificate.rollNumber}
             </p>
             <p>
               <span className="font-semibold text-foreground">Branch:</span>{" "}
@@ -109,12 +105,33 @@ export default async function CertificateDetailPage({
                 {certificate.revokedAt ? "Revoked" : "Active"}
               </StatusBadge>
             </p>
+            {certificate.description ? (
+              <p>
+                <span className="font-semibold text-foreground">Notes:</span>{" "}
+                {certificate.description}
+              </p>
+            ) : null}
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
             <RevokeButton
               certId={verifyId}
               revokedAt={certificate.revokedAt?.toISOString() ?? null}
             />
+            <Button asChild size="sm" variant="outline">
+              <Link href={verifyUrl}>
+                Open verification link
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        </AdminSectionCard>
+
+        <AdminSectionCard title="Share verification">
+          <p className="text-sm text-muted-foreground">
+            Send this verification link to organizers or employers to confirm authenticity.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <ShareButton value={verifyUrl} />
             <Button asChild size="sm" variant="outline">
               <Link href={verifyUrl}>
                 Open verification link

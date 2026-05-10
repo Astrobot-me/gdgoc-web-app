@@ -7,8 +7,12 @@ type ExportRouteParams = {
 
 export async function GET(request: NextRequest, { params }: ExportRouteParams) {
   const { id } = await params;
+  const eventId = Number(id);
+  if (Number.isNaN(eventId)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
   const event = await prisma.event.findUnique({
-    where: { id },
+    where: { id: eventId },
     include: { certificates: true },
   });
 
@@ -28,13 +32,13 @@ export async function GET(request: NextRequest, { params }: ExportRouteParams) {
       updatedAt: event.updatedAt,
     },
     certificates: event.certificates.map((cert) => ({
-      id: cert.id,
+      certificateId: cert.certificateId,
       credentialId: cert.credentialId,
       holderName: cert.holderName,
       rollNumber: cert.rollNumber,
       branch: cert.branch,
       certificateType: cert.certificateType,
-      distinction: cert.distinction,
+      description: cert.description,
       issuedAt: cert.issuedAt,
       revokedAt: cert.revokedAt,
       createdAt: cert.createdAt,
@@ -45,23 +49,25 @@ export async function GET(request: NextRequest, { params }: ExportRouteParams) {
 
   if (format === "csv") {
     const header = [
+      "Certificate ID",
       "Credential ID",
       "Holder Name",
       "Roll Number",
       "Branch",
       "Certificate Type",
-      "Distinction",
+      "Description",
       "Issued At",
       "Revoked At",
     ];
     const lines = exportPayload.certificates.map((cert) =>
       [
-        cert.credentialId ?? cert.id,
+        cert.certificateId,
+        cert.credentialId,
         cert.holderName,
         cert.rollNumber,
         cert.branch,
         cert.certificateType,
-        cert.distinction ?? "",
+        cert.description ?? "",
         cert.issuedAt?.toISOString?.() ?? String(cert.issuedAt),
         cert.revokedAt?.toISOString?.() ?? "",
       ]

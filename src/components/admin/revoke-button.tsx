@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,7 @@ export function RevokeButton({ certId, revokedAt, onChange }: RevokeButtonProps)
       });
 
       if (!response.ok) {
+        toast.error("Unable to update certificate status.");
         return;
       }
 
@@ -41,6 +43,11 @@ export function RevokeButton({ certId, revokedAt, onChange }: RevokeButtonProps)
 
       setCurrent(data.certificate.revokedAt);
       onChange?.(data.certificate.revokedAt);
+      toast.success(
+        data.certificate.revokedAt
+          ? "Certificate revoked."
+          : "Certificate restored."
+      );
     });
   };
 

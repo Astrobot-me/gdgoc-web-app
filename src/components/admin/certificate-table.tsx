@@ -19,7 +19,8 @@ import {
 
 export type CertificateRow = {
   id: string;
-  credentialId: string | null;
+  certificateId: string;
+  credentialId: string;
   holderName: string;
   rollNumber: string;
   branch: string;
@@ -28,7 +29,7 @@ export type CertificateRow = {
 };
 
 type CertificateTableProps = {
-  eventId: string;
+  eventId: number;
   rows: CertificateRow[];
 };
 
@@ -42,7 +43,13 @@ export function CertificateTable({ eventId, rows }: CertificateTableProps) {
       return items;
     }
     return items.filter((row) =>
-      [row.holderName, row.rollNumber, row.branch, row.credentialId]
+      [
+        row.holderName,
+        row.rollNumber,
+        row.branch,
+        row.credentialId,
+        row.certificateId,
+      ]
         .filter(Boolean)
         .some((value) =>
           String(value).toLowerCase().includes(term),
@@ -90,7 +97,10 @@ export function CertificateTable({ eventId, rows }: CertificateTableProps) {
                 <TableCell>
                   <div className="font-semibold">{row.holderName}</div>
                   <div className="text-xs text-muted-foreground">
-                    {row.credentialId ?? row.id}
+                    Credential ID: {row.credentialId}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Certificate ID: {row.certificateId}
                   </div>
                 </TableCell>
                 <TableCell>{row.rollNumber}</TableCell>
@@ -105,15 +115,13 @@ export function CertificateTable({ eventId, rows }: CertificateTableProps) {
                   <div className="flex justify-end gap-2">
                     <Button asChild size="sm" variant="outline">
                       <Link
-                        href={`/admin/events/${eventId}/certificates/${
-                          row.credentialId ?? row.id
-                        }`}
+                        href={`/admin/events/${eventId}/certificates/${row.credentialId}`}
                       >
                         View
                       </Link>
                     </Button>
                     <RevokeButton
-                      certId={row.credentialId ?? row.id}
+                      certId={row.credentialId}
                       revokedAt={row.revokedAt}
                       onChange={(value) => updateRow(row.id, value)}
                     />

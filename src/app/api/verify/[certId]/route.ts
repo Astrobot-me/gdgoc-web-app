@@ -19,7 +19,7 @@ export async function GET(request: NextRequest, { params }: VerifyRouteParams) {
 
     const certificate = await prisma.certificate.findFirst({
         where: {
-            OR: [{ id: certId }, { credentialId: certId }],
+            OR: [{ credentialId: certId }, { certificateId: certId }],
         },
         include: { event: true },
     });
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest, { params }: VerifyRouteParams) {
     await prisma.verificationLog.create({
         data: {
             status,
-            certId: certificate.id,
+            certId: certificate.credentialId,
             eventId: certificate.eventId,
             userAgent,
             referer,
@@ -57,12 +57,13 @@ export async function GET(request: NextRequest, { params }: VerifyRouteParams) {
     return NextResponse.json({
         status: status === "VALID" ? "valid" : "revoked",
         certificate: {
-            id: certificate.id,
+            certificateId: certificate.certificateId,
+            credentialId: certificate.credentialId,
             holderName: certificate.holderName,
             rollNumber: certificate.rollNumber,
             branch: certificate.branch,
             certificateType: certificate.certificateType,
-            distinction: certificate.distinction,
+            description: certificate.description,
             issuedAt: certificate.issuedAt,
             revokedAt: certificate.revokedAt,
         },

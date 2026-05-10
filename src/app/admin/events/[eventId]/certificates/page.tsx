@@ -18,14 +18,20 @@ export default async function EventCertificatesPage({
   params,
 }: EventCertificatesPageProps) {
   const { eventId } = await params;
-  const event = await prisma.event.findUnique({ where: { id: eventId } });
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    notFound();
+  }
+  const event = await prisma.event.findUnique({
+    where: { id: eventIdValue },
+  });
 
   if (!event) {
     notFound();
   }
 
   const certificates = await prisma.certificate.findMany({
-    where: { eventId },
+    where: { eventId: eventIdValue },
     orderBy: { issuedAt: "desc" },
   });
 
@@ -56,9 +62,10 @@ export default async function EventCertificatesPage({
       </section>
 
       <CertificateTable
-        eventId={eventId}
+        eventId={eventIdValue}
         rows={certificates.map((cert) => ({
-          id: cert.id,
+          id: String(cert.id),
+          certificateId: cert.certificateId,
           credentialId: cert.credentialId,
           holderName: cert.holderName,
           rollNumber: cert.rollNumber,

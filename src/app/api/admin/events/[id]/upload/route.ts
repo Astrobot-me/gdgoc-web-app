@@ -26,6 +26,10 @@ const getHeaderIndex = (headers: string[], candidates: string[]) => {
 
 export async function POST(request: NextRequest, { params }: UploadRouteParams) {
   const { id: eventId } = await params;
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -63,6 +67,14 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
   const [headerRow, ...dataRows] = rows;
   const headers = (headerRow ?? []).map(normalizeHeader);
 
+  const certificateIdIndex = getHeaderIndex(headers, [
+    "certificate id",
+    "certificate_id",
+    "certificateid",
+    "certificate no",
+    "certificate number",
+    "cert id",
+  ]);
   const credentialIndex = getHeaderIndex(headers, [
     "credential id",
     "credential_id",
@@ -76,15 +88,21 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
     "certificate_type",
     "type",
   ]);
-  const distinctionIndex = getHeaderIndex(headers, [
+  const descriptionIndex = getHeaderIndex(headers, [
+    "description",
     "distinction",
     "achievement",
     "award",
     "position",
     "result",
+    "notes",
   ]);
 
-  if ([credentialIndex, nameIndex, branchIndex, rollIndex].some((idx) => idx < 0)) {
+  if (
+    [certificateIdIndex, nameIndex, branchIndex, rollIndex].some(
+      (idx) => idx < 0,
+    )
+  ) {
     return NextResponse.json(
       { error: "Missing required columns in upload." },
       { status: 400 },
@@ -94,34 +112,39 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
   const errors: UploadError[] = [];
   const parsedRows = dataRows
     .map((row, index) => {
-      const credentialId = String(row[credentialIndex] ?? "").trim();
+      const certificateId = String(row[certificateIdIndex] ?? "").trim();
+      const credentialId =
+        credentialIndex >= 0
+          ? String(row[credentialIndex] ?? "").trim() || undefined
+          : undefined;
       const holderName = String(row[nameIndex] ?? "").trim();
       const branch = String(row[branchIndex] ?? "").trim();
       const rollNumber = String(row[rollIndex] ?? "").trim();
       const certificateType = row[typeIndex] ?? undefined;
-      const distinction =
-        distinctionIndex >= 0
-          ? String(row[distinctionIndex] ?? "").trim() || undefined
+      const description =
+        descriptionIndex >= 0
+          ? String(row[descriptionIndex] ?? "").trim() || undefined
           : undefined;
 
       if (
-        !credentialId &&
+        !certificateId &&
         !holderName &&
         !branch &&
         !rollNumber &&
         !certificateType &&
-        !distinction
+        !description
       ) {
         return null;
       }
 
       const parsed = ExcelRowSchema.safeParse({
+        certificateId,
         credentialId,
         holderName,
         branch,
         rollNumber,
         certificateType,
-        distinction,
+        description,
       });
 
       if (!parsed.success) {
@@ -136,15 +159,26 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
     })
     .filter((row): row is ReturnType<typeof ExcelRowSchema.parse> => row !== null);
 
+  const seenCertificateIds = new Set<string>();
   const seenCredentials = new Set<string>();
   for (const row of parsedRows) {
-    if (seenCredentials.has(row.credentialId)) {
+    if (seenCertificateIds.has(row.certificateId)) {
       errors.push({
         row: -1,
-        message: `Duplicate credential ID in upload: ${row.credentialId}`,
+        message: `Duplicate certificate ID in upload: ${row.certificateId}`,
       });
     }
-    seenCredentials.add(row.credentialId);
+    seenCertificateIds.add(row.certificateId);
+
+    if (row.credentialId) {
+      if (seenCredentials.has(row.credentialId)) {
+        errors.push({
+          row: -1,
+          message: `Duplicate credential ID in upload: ${row.credentialId}`,
+        });
+      }
+      seenCredentials.add(row.credentialId);
+    }
   }
 
   if (errors.length) {
@@ -156,22 +190,22 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
   }
 
   const existing = await prisma.certificate.findMany({
-    where: { credentialId: { in: parsedRows.map((row) => row.credentialId) } },
+    where: { certificateId: { in: parsedRows.map((row) => row.certificateId) } },
   });
-  const existingByCredential = new Map(
-    existing.map((cert) => [cert.credentialId, cert]),
+  const existingByCertificate = new Map(
+    existing.map((cert) => [cert.certificateId, cert]),
   );
 
   let inserted = 0;
   let updated = 0;
 
   for (const row of parsedRows) {
-    const existingCert = existingByCredential.get(row.credentialId);
+    const existingCert = existingByCertificate.get(row.certificateId);
 
-    if (existingCert && existingCert.eventId !== eventId) {
+    if (existingCert && existingCert.eventId !== eventIdValue) {
       errors.push({
         row: -1,
-        message: `Credential ID already used in another event: ${row.credentialId}`,
+        message: `Certificate ID already used in another event: ${row.certificateId}`,
       });
       continue;
     }
@@ -184,7 +218,7 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
           rollNumber: row.rollNumber,
           branch: row.branch,
           certificateType: row.certificateType,
-          distinction: row.distinction,
+          description: row.description,
         },
       });
       updated += 1;
@@ -193,13 +227,14 @@ export async function POST(request: NextRequest, { params }: UploadRouteParams) 
 
     await prisma.certificate.create({
       data: {
+        certificateId: row.certificateId,
         credentialId: row.credentialId,
-        eventId,
+        eventId: eventIdValue,
         holderName: row.holderName,
         rollNumber: row.rollNumber,
         branch: row.branch,
         certificateType: row.certificateType,
-        distinction: row.distinction,
+        description: row.description,
       },
     });
     inserted += 1;

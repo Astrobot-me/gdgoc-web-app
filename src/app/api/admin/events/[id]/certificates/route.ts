@@ -11,6 +11,10 @@ export async function POST(
   { params }: CertificatesRouteParams,
 ) {
   const { id: eventId } = await params;
+  const eventIdValue = Number(eventId);
+  if (Number.isNaN(eventIdValue)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
   const body = await request.json();
   const parsed = CreateCertificateSchema.safeParse(body);
 
@@ -24,13 +28,14 @@ export async function POST(
   try {
     const certificate = await prisma.certificate.create({
       data: {
-        eventId,
+        eventId: eventIdValue,
+        certificateId: parsed.data.certificateId,
         credentialId: parsed.data.credentialId,
         holderName: parsed.data.holderName,
         rollNumber: parsed.data.rollNumber,
         branch: parsed.data.branch,
         certificateType: parsed.data.certificateType,
-        distinction: parsed.data.distinction,
+        description: parsed.data.description,
         issuedAt: parsed.data.issuedAt,
       },
     });

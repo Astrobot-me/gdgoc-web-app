@@ -34,29 +34,16 @@ export const normalizeCertificateType = (
   return "PARTICIPATION";
 };
 
-export const normalizeDistinction = (
-  certificateType: CertificateTypeValue,
-  value: unknown,
-) => {
-  const distinction = String(value ?? "").trim();
-
-  if (certificateType === "WINNER") {
-    return distinction || "Winner";
-  }
-
-  return undefined;
-};
-
 export const getCertificateHeadline = ({
   certificateType,
-  distinction,
+  label,
 }: {
   certificateType: CertificateTypeValue;
-  distinction?: string | null;
+  label?: string | null;
 }) => {
   if (certificateType === "WINNER") {
-    return distinction || "Winner";
+    return label || certificateTypeLabels.WINNER;
   }
 
-  return "Participant";
+  return certificateTypeLabels.PARTICIPATION;
 };

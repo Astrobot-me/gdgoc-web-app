@@ -18,11 +18,11 @@ export default function VerifyIndexPage() {
             Confirm authenticity in seconds
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            Paste the certificate ID or scanned QR code URL. We will confirm the
-            holder details, event, and status instantly.
+            Paste the credential ID, certificate ID, or scanned QR code URL. We
+            will confirm the holder details, event, and status instantly.
           </p>
           <div className="mt-6">
-            <VerifyLookupForm placeholder="Certificate ID or code" />
+            <VerifyLookupForm placeholder="Credential ID or certificate ID" />
           </div>
         </header>
 

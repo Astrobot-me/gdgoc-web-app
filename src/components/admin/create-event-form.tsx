@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -55,10 +56,12 @@ export function CreateEventForm() {
 
       if (!response.ok) {
         setError("Failed to create event. Check the form values.");
+        toast.error("Failed to create event.");
         return;
       }
 
       setForm(initialState);
+      toast.success("Event has been created.");
       router.refresh();
     });
   };
@@ -105,7 +108,7 @@ export function CreateEventForm() {
               value={form.description}
               onChange={(event) => updateField("description", event.target.value)}
               placeholder="Short description (optional)"
-              className="min-h-[96px]"
+              className="min-h-24"
             />
           </div>
           <div className="grid gap-2">

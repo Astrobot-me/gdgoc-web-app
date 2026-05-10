@@ -3,37 +3,40 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { BadgePlus } from "lucide-react";
+import { toast } from "sonner";
 import { CreateCertificateSchema } from "@/lib/validation";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "../ui/textarea";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 type FormState = {
+  certificateId: string;
   credentialId: string;
   holderName: string;
   rollNumber: string;
   branch: string;
   issuedAt: string;
-  description : string; 
-  type : "PARTICIPANT" | "WINNER"; 
+  description: string;
+  certificateType: "PARTICIPATION" | "WINNER";
 };
 
 const initialState: FormState = {
+  certificateId: "",
   credentialId: "",
   holderName: "",
   rollNumber: "",
   branch: "",
   issuedAt: "",
-  description : "",
-  type : "PARTICIPANT"
+  description: "",
+  certificateType: "PARTICIPATION",
 };
 
 type SingleCertificateFormProps = {
-  eventId: number
-  ;
+  eventId: number;
 };
 
 export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
@@ -51,16 +54,20 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
     setError(null);
 
     const payload = {
+      certificateId: form.certificateId.trim(),
       credentialId: form.credentialId.trim() || undefined,
       holderName: form.holderName.trim(),
       rollNumber: form.rollNumber.trim(),
       branch: form.branch.trim(),
+      certificateType: form.certificateType,
+      description: form.description.trim() || undefined,
       issuedAt: form.issuedAt ? new Date(form.issuedAt) : undefined,
     };
 
     const parsed = CreateCertificateSchema.safeParse(payload);
     if (!parsed.success) {
       setError(parsed.error.errors[0]?.message ?? "Invalid data.");
+      toast.error("Please check the certificate details.");
       return;
     }
 
@@ -78,10 +85,12 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
 
       if (!response.ok) {
         setError("Failed to add certificate. Check for duplicates.");
+        toast.error("Failed to add certificate.");
         return;
       }
 
       setForm(initialState);
+      toast.success("Certificate added.");
       router.refresh();
     });
   };
@@ -90,16 +99,26 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
     <form onSubmit={handleSubmit}>
       <AdminSectionCard
         eyebrow="Add single certificate"
-        title="Manually add a participant"
+        title="Manually add a certificate"
       >
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="credential-id">Credential ID</Label>
+            <Label htmlFor="certificate-id">Certificate ID</Label>
+            <Input
+              id="certificate-id"
+              value={form.certificateId}
+              onChange={(event) => updateField("certificateId", event.target.value)}
+              placeholder="Certificate ID"
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="credential-id">Credential ID (optional)</Label>
             <Input
               id="credential-id"
               value={form.credentialId}
               onChange={(event) => updateField("credentialId", event.target.value)}
-              placeholder="Credential ID (optional)"
+              placeholder="Auto-generated if left blank"
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -145,18 +164,31 @@ export function SingleCertificateForm({ eventId }: SingleCertificateFormProps) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="issued-at">Type</Label>
-              <Textarea
-                id="issued-at"
-                value={form.description}
-                onChange={(event) => updateField("description", event.target.value)}
-                // type="text"
-              />
+              <Label htmlFor="certificate-type">Certificate type</Label>
+              <Select
+                id="certificate-type"
+                value={form.certificateType}
+                onChange={(event) =>
+                  updateField(
+                    "certificateType",
+                    event.target.value as FormState["certificateType"],
+                  )
+                }
+              >
+                <option value="PARTICIPATION">Participation</option>
+                <option value="WINNER">Winner</option>
+              </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="issued-at">Issued date</Label>
-              
-            </div>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="certificate-description">Description (optional)</Label>
+            <Textarea
+              id="certificate-description"
+              value={form.description}
+              onChange={(event) => updateField("description", event.target.value)}
+              placeholder="Award, position, or extra notes"
+              className="min-h-24"
+            />
           </div>
           {error ? (
             <Alert variant="destructive">

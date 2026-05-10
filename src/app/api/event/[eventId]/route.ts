@@ -7,8 +7,12 @@ type EventRouteParams = {
 
 export async function GET(_request: NextRequest, { params }: EventRouteParams) {
 	const { eventId } = await params;
+	const eventIdValue = Number(eventId);
+	if (Number.isNaN(eventIdValue)) {
+		return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+	}
 	const event = await prisma.event.findUnique({
-		where: { id: eventId },
+		where: { id: eventIdValue },
 		include: { _count: { select: { certificates: true } } },
 	});
 

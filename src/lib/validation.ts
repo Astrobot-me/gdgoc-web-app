@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   certificateTypeValues,
   normalizeCertificateType,
-  normalizeDistinction,
 } from "@/lib/certificate-types";
 
 const CertificateTypeSchema = z.enum(certificateTypeValues);
@@ -18,7 +17,8 @@ export const CreateEventSchema = z.object({
 export const UpdateEventSchema = CreateEventSchema.partial();
 
 export const ExcelRowSchema = z.object({
-  credentialId: z.string().min(1),
+  certificateId: z.string().min(1),
+  credentialId: z.string().min(1).optional(),
   holderName: z.string().min(1),
   rollNumber: z.string().min(1),
   branch: z.string().min(1),
@@ -26,26 +26,21 @@ export const ExcelRowSchema = z.object({
     .unknown()
     .optional()
     .transform((value) => normalizeCertificateType(value)),
-  distinction: z.string().trim().max(80).optional(),
-}).transform((value) => ({
-  ...value,
-  distinction: normalizeDistinction(value.certificateType, value.distinction),
-}));
+  description: z.string().trim().max(160).optional(),
+});
 
 export const BulkUploadSchema = z.array(ExcelRowSchema).min(1).max(5000);
 
 export const CreateCertificateSchema = z.object({
+  certificateId: z.string().min(1),
   credentialId: z.string().min(1).optional(),
   holderName: z.string().min(1),
   rollNumber: z.string().min(1),
   branch: z.string().min(1),
   certificateType: CertificateTypeSchema.default("PARTICIPATION"),
-  distinction: z.string().trim().max(80).optional(),
+  description: z.string().trim().max(160).optional(),
   issuedAt: z.coerce.date().optional(),
-}).transform((value) => ({
-  ...value,
-  distinction: normalizeDistinction(value.certificateType, value.distinction),
-}));
+});
 
 export const AdminLoginSchema = z.object({
   email: z.string().email(),

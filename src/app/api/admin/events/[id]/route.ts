@@ -8,8 +8,12 @@ type EventRouteParams = {
 
 export async function GET(_request: NextRequest, { params }: EventRouteParams) {
   const { id } = await params;
+  const eventId = Number(id);
+  if (Number.isNaN(eventId)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
   const event = await prisma.event.findUnique({
-    where: { id },
+    where: { id: eventId },
     include: { _count: { select: { certificates: true } } },
   });
 
@@ -34,6 +38,10 @@ export async function GET(_request: NextRequest, { params }: EventRouteParams) {
 
 export async function PATCH(request: NextRequest, { params }: EventRouteParams) {
   const { id } = await params;
+  const eventId = Number(id);
+  if (Number.isNaN(eventId)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
   const body = await request.json();
   const parsed = UpdateEventSchema.safeParse(body);
 
@@ -45,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: EventRouteParams) 
   }
 
   const event = await prisma.event.update({
-    where: { id },
+    where: { id: eventId },
     data: parsed.data,
   });
 
@@ -54,8 +62,12 @@ export async function PATCH(request: NextRequest, { params }: EventRouteParams) 
 
 export async function DELETE(_request: NextRequest, { params }: EventRouteParams) {
   const { id } = await params;
+  const eventId = Number(id);
+  if (Number.isNaN(eventId)) {
+    return NextResponse.json({ error: "Invalid event id." }, { status: 400 });
+  }
 
-  await prisma.event.delete({ where: { id } });
+  await prisma.event.delete({ where: { id: eventId } });
 
   return NextResponse.json({ status: "deleted" });
 }

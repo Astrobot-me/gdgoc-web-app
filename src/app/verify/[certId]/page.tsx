@@ -3,7 +3,10 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import QRCode from "qrcode";
 import { AlertTriangle, BadgeCheck, ArrowUpRight } from "lucide-react";
+import { CertificateTypeBadge } from "@/components/certificate-type-badge";
+import { ConfettiTrigger } from "@/components/confetti-trigger";
 import { ShareButton } from "@/components/share-button";
+import { WinnerCelebration } from "@/components/winner-celebration";
 import { Button } from "@/components/ui/button";
 
 export const runtime = "nodejs";
@@ -15,10 +18,13 @@ type VerifyPageProps = {
 type VerifyResponse = {
   status: "valid" | "revoked";
   certificate: {
-    id: string;
+    certificateId: string;
+    credentialId: string;
     holderName: string;
     rollNumber: string;
     branch: string;
+    certificateType: "PARTICIPATION" | "WINNER";
+    description: string | null;
     issuedAt: string;
     revokedAt: string | null;
   };
@@ -56,7 +62,6 @@ const getBaseUrl = async () => {
 export default async function VerifyPage({ params }: VerifyPageProps) {
   const { certId } = await params;
   const baseUrl = await getBaseUrl();
-  const verifyUrl = `${baseUrl}/verify/${certId}`;
 
   let response: Response | null = null;
   let payload: VerifyResponse | null = null;
@@ -74,6 +79,12 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   const status = payload?.status ?? "not_found";
   const isValid = status === "valid";
   const isRevoked = status === "revoked";
+  const verifyId = payload?.certificate.credentialId ?? certId;
+  const verifyUrl = `${baseUrl}/verify/${verifyId}`;
+  const awardLabel =
+    payload?.certificate.certificateType === "WINNER"
+      ? payload.certificate.description
+      : undefined;
 
   const qrCode = await QRCode.toDataURL(verifyUrl, {
     margin: 1,
@@ -136,7 +147,27 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
               <h2 className="font-heading text-2xl text-foreground">
                 Certificate details
               </h2>
+              {payload?.certificate.certificateType ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <CertificateTypeBadge
+                    certificateType={payload.certificate.certificateType}
+                    label={awardLabel}
+                  />
+                </div>
+              ) : null}
               <div className="mt-6 grid gap-4 text-sm">
+                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                  <span className="text-muted-foreground">Credential ID</span>
+                  <span className="font-semibold text-foreground">
+                    {payload?.certificate.credentialId}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-b border-muted/40 pb-3">
+                  <span className="text-muted-foreground">Certificate ID</span>
+                  <span className="font-semibold text-foreground">
+                    {payload?.certificate.certificateId}
+                  </span>
+                </div>
                 <div className="flex items-center justify-between border-b border-muted/40 pb-3">
                   <span className="text-muted-foreground">Holder name</span>
                   <span className="font-semibold text-foreground">
@@ -177,6 +208,11 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                       : "-"}
                   </span>
                 </div>
+                {payload?.certificate.description ? (
+                  <div className="rounded-2xl border border-muted/40 bg-muted/30 p-4 text-sm text-muted-foreground">
+                    {payload.certificate.description}
+                  </div>
+                ) : null}
                 {payload?.event.venue ? (
                   <div className="flex items-center justify-between border-b border-muted/40 pb-3">
                     <span className="text-muted-foreground">Venue</span>
@@ -203,28 +239,34 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
             </div>
 
             <div className="flex flex-col gap-6">
-              <div className="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-sm">
-                <h3 className="font-heading text-xl text-foreground">
-                  Certificate preview
-                </h3>
-                <div className="mt-4 overflow-hidden rounded-2xl border border-muted/40 bg-white">
-                  <Image
-                    src={`${baseUrl}/api/certificate/${certId}/image`}
-                    alt="Certificate preview"
-                    width={1200}
-                    height={850}
-                    className="h-auto w-full"
-                    priority
-                    unoptimized
+              {isValid && !isRevoked ? (
+                payload?.certificate.certificateType === "WINNER" ? (
+                  <WinnerCelebration
+                    eventName={payload.event.name}
+                    awardLabel={awardLabel}
+                    autoPlay
                   />
-                </div>
-                {isRevoked ? (
-                  <div className="mt-4 flex items-center gap-2 rounded-2xl border border-(--gdg-red)/30 bg-(--gdg-red)/10 px-4 py-3 text-sm text-(--gdg-red)">
-                    <AlertTriangle className="size-4" />
-                    This certificate has been revoked by the chapter admins.
+                ) : (
+                  <div className="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-sm">
+                    <h3 className="font-heading text-xl text-foreground">
+                      Celebrate the verification
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      This certificate is verified and ready to share. Throw some confetti or send the link below.
+                    </p>
+                    <div className="mt-4">
+                      <ConfettiTrigger autoPlay label="Throw confetti" />
+                    </div>
                   </div>
-                ) : null}
-              </div>
+                )
+              ) : null}
+
+              {isRevoked ? (
+                <div className="flex items-center gap-2 rounded-3xl border border-(--gdg-red)/30 bg-(--gdg-red)/10 px-4 py-4 text-sm text-(--gdg-red)">
+                  <AlertTriangle className="size-4" />
+                  This certificate has been revoked by the chapter admins.
+                </div>
+              ) : null}
 
               <div className="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-sm">
                 <div className="flex items-center justify-between">
