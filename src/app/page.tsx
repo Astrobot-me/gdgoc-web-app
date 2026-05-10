@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,9 +29,16 @@ export default async function Home() {
 
         <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-20 pt-16 md:pt-20">
           <header className="flex flex-col gap-8">
-            <div className="flex items-center gap-3 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-(--gdg-blue)" />
-              GDG on Campus - RIT Roorkee
+            <div className="flex items-center gap-4">
+              <Image
+                src="/logo3.webp"
+                alt="GDG on Campus RIT Roorkee logo"
+                width={310}
+                height={107}
+                className=" "
+                priority
+              />
+  
             </div>
             <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr]">
               <div className="space-y-6">

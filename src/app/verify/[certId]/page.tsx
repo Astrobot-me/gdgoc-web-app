@@ -5,9 +5,11 @@ import QRCode from "qrcode";
 import { AlertTriangle, BadgeCheck, ArrowUpRight } from "lucide-react";
 import { CertificateTypeBadge } from "@/components/certificate-type-badge";
 import { ConfettiTrigger } from "@/components/confetti-trigger";
+import { DownloadCertificateButton } from "@/components/download-certificate-button";
 import { ShareButton } from "@/components/share-button";
 import { WinnerCelebration } from "@/components/winner-celebration";
 import { Button } from "@/components/ui/button";
+
 
 export const runtime = "nodejs";
 
@@ -81,6 +83,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   const isRevoked = status === "revoked";
   const verifyId = payload?.certificate.credentialId ?? certId;
   const verifyUrl = `${baseUrl}/verify/${verifyId}`;
+ 
   const awardLabel =
     payload?.certificate.certificateType === "WINNER"
       ? payload.certificate.description
@@ -92,8 +95,11 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-6 py-28">
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#dbeafe,transparent_50%),linear-gradient(160deg,#f8fafc,#ffffff)] px-6 py-28 ">
+      <main
+        id="certifcate-card"
+        className="mx-auto flex w-full max-w-5xl flex-col gap-8 "
+      >
         <header className="flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/80 p-8 shadow-sm backdrop-blur">
           <div className="flex items-center justify-between">
             <div>
@@ -121,7 +127,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
           </p>
 
           <div className="rounded-xl ">
-                <Image src="/banner.webp" alt="banner" width="1500" height="500"/>
+                <Image src="/banner3.webp" alt="banner" width="1500" height="500"/>
           </div>
         </header>
 
@@ -245,6 +251,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                     <ArrowUpRight className="size-4" />
                   </Link>
                 </Button>
+                <DownloadCertificateButton certId={certId} />
               </div>
             </div>
 
