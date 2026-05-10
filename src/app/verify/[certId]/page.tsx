@@ -167,60 +167,60 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
               ) : null}
               <div className="mt-6 grid gap-4 text-sm">
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Credential ID</span>
-                  <span className="font-semibold break-all text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Credential ID</span>
+                  <span className="font-semibold break-all text-foreground text-left sm:text-right">
                     {payload?.certificate.credentialId}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Certificate ID</span>
-                  <span className="font-semibold break-all text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Certificate ID</span>
+                  <span className="font-semibold break-all text-foreground text-left sm:text-right">
                     {payload?.certificate.certificateId}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Holder name</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Holder name</span>
+                  <span className="font-semibold break-words text-foreground text-left sm:text-right">
                     {payload?.certificate.holderName}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Roll number</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Roll number</span>
+                  <span className="font-semibold break-words text-foreground text-left sm:text-right">
                     {payload?.certificate.rollNumber}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Branch</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Branch</span>
+                  <span className="font-semibold break-words text-foreground text-left sm:text-right">
                     {payload?.certificate.branch}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Event</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Event</span>
+                  <span className="font-semibold break-words text-foreground text-left sm:text-right">
                     {payload?.event.name}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Event date</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Event date</span>
+                  <span className="font-semibold text-foreground text-left sm:text-right">
                     {payload?.event.eventDate
                       ? formatDate(payload.event.eventDate)
                       : "-"}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Issued on</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Issued on</span>
+                  <span className="font-semibold text-foreground text-left sm:text-right">
                     {payload?.certificate.issuedAt
                       ? formatDate(payload.certificate.issuedAt)
                       : "-"}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <span className="text-muted-foreground">Issued by</span>
-                  <span className="font-semibold text-foreground text-right sm:text-left">
+                  <span className="shrink-0 text-muted-foreground">Issued by</span>
+                  <span className="font-semibold break-words text-foreground text-left sm:text-right">
                     Google Developer Group RIT Roorkee
                   </span>
                 </div>
@@ -231,14 +231,14 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                 ) : null}
                 {payload?.event.venue ? (
                   <div className="flex flex-col gap-1 border-b border-muted/40 pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <span className="text-muted-foreground">Venue</span>
-                    <span className="font-semibold text-foreground text-right sm:text-left">
+                    <span className="shrink-0 text-muted-foreground">Venue</span>
+                    <span className="font-semibold break-words text-foreground text-left sm:text-right">
                       {payload.event.venue}
                     </span>
                   </div>
                 ) : null}
                 {payload?.event.description ? (
-                  <div className="rounded-2xl border border-muted/40 bg-muted/30 p-4 text-sm text-muted-foreground">
+                  <div className="rounded-2xl border border-muted/40 bg-muted/30 p-4 text-sm break-words text-muted-foreground">
                     {payload.event.description}
                   </div>
                 ) : null}
